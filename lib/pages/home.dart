@@ -1,25 +1,23 @@
 import 'package:flutter/material.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
+  @override
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
+    int _currentIndex = 0;
+
     return Scaffold(
-        body: SafeArea(
-      child: Column(
-        children: <Widget>[
-          Center(
-            child: Text('Home Screen'),
-          ),
-          FlatButton.icon(
-              onPressed: () {
-                Navigator.pushNamed(context, '/signin');
-              },
-              icon: Icon(
-                Icons.arrow_forward_rounded,
-              ),
-              label: Text('sign-in'))
-        ],
-      ),
-    ));
+        appBar: AppBar(
+          title: Text('Speedplanner'),
+          backgroundColor: Colors.purple[800],
+        ),
+        body: Container(
+            child: Center(
+          child: Text('Home Screen'),
+        )));
   }
 }

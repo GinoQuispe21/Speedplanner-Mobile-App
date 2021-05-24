@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:speedplanner/pages/firstScreen.dart';
 import 'package:speedplanner/pages/home.dart';
-import 'package:speedplanner/pages/sign-in.dart';
+import 'package:speedplanner/pages/signIn.dart';
+import 'package:speedplanner/pages/signUp.dart';
 
 void main() {
   runApp(MaterialApp(
-    routes: {'/': (context) => Home(), '/signin': (context) => signIn()},
+    initialRoute: '/firstScreen',
+    routes: {
+      '/': (context) => Home(),
+      '/firstScreen': (context) => FirstScreen(),
+      '/signin': (context) => SignIn(),
+      '/signup': (context) => SignUp(),
+    },
   ));
 }
