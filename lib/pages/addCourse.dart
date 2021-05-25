@@ -4,12 +4,12 @@ import 'package:speedplanner/pages/groups.dart';
 import 'package:speedplanner/pages/profile.dart';
 import 'package:speedplanner/pages/tasks.dart';
 
-class Home extends StatefulWidget {
+class AddCourse extends StatefulWidget {
   @override
-  _HomeState createState() => _HomeState();
+  _AddCourseState createState() => _AddCourseState();
 }
 
-class _HomeState extends State<Home> {
+class _AddCourseState extends State<AddCourse> {
   int _currentIndex = 0;
 
   final tabs = [Courses(), Tasks(), Groups(), Profile()];
@@ -70,7 +70,9 @@ class _HomeState extends State<Home> {
           )
         ],
       ),
-      body: tabs[_currentIndex],
+      body: Container(
+          decoration: BoxDecoration(color: Color(0xff80C3B5)),
+          child: Text('Add Course')),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
             border: Border(

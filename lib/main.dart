@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:speedplanner/pages/addCourse.dart';
 import 'package:speedplanner/pages/firstScreen.dart';
 import 'package:speedplanner/pages/home.dart';
 import 'package:speedplanner/pages/signIn.dart';
@@ -12,6 +13,8 @@ void main() {
       '/firstScreen': (context) => FirstScreen(),
       '/signin': (context) => SignIn(),
       '/signup': (context) => SignUp(),
+      '/addCourse': (context) => AddCourse(),
     },
+    //home: Home(),
   ));
 }
