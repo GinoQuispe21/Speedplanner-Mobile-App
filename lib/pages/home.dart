@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:speedplanner/pages/addCourse.dart';
 import 'package:speedplanner/pages/courses.dart';
 import 'package:speedplanner/pages/groups.dart';
 import 'package:speedplanner/pages/profile.dart';
@@ -12,10 +13,17 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int _currentIndex = 0;
 
-  final tabs = [Courses(), Tasks(), Groups(), Profile()];
+  bool createCourse = false;
 
   @override
   Widget build(BuildContext context) {
+    final tabs = [
+      createCourse ? AddCourse() : Courses(),
+      Tasks(),
+      Groups(),
+      Profile()
+    ];
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Speedplanner'),
@@ -71,6 +79,23 @@ class _HomeState extends State<Home> {
         ],
       ),
       body: tabs[_currentIndex],
+      floatingActionButton: _currentIndex == 0
+          ? FloatingActionButton(
+              backgroundColor: Color(0x00000000),
+              elevation: 0,
+              onPressed: () {
+                //print(createCourse);
+                setState(() {
+                  createCourse = true;
+                });
+              },
+              child: const Icon(
+                Icons.add_circle_outline_sharp,
+                color: Color(0xff8377D1),
+                size: 50.0,
+              ),
+            )
+          : Container(),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
             border: Border(

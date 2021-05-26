@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:speedplanner/pages/addCourse.dart';
 
 class Courses extends StatefulWidget {
   @override
@@ -9,7 +10,7 @@ class _CoursesState extends State<Courses> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        floatingActionButton: FloatingActionButton(
+        /*floatingActionButton: FloatingActionButton(
           backgroundColor: Color(0x00000000),
           elevation: 0,
           onPressed: () {
@@ -20,9 +21,10 @@ class _CoursesState extends State<Courses> {
             color: Color(0xff8377D1),
             size: 50.0,
           ),
-        ),
+        ),*/
         body: Container(
-          decoration: BoxDecoration(color: Color(0xffE9EBF8)),
-        ));
+      decoration: BoxDecoration(color: Color(0xffE9EBF8)),
+      child: Text('No hay cursos'),
+    ));
   }
 }
