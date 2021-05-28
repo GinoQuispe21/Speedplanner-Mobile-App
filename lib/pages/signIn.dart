@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:speedplanner/utils/colors.dart';
 
 import 'package:speedplanner/pages/home.dart';
+import 'package:speedplanner/utils/textInput.dart';
 
 class SignIn extends StatefulWidget {
   @override
@@ -18,7 +19,7 @@ class _SignInState extends State<SignIn> {
             gradient: LinearGradient(
                 end: Alignment.topLeft,
                 begin: Alignment.bottomRight,
-                colors: <Color>[purpleColor, greenColor])),
+                colors: <Color>[greenColor, purpleColor])),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
@@ -40,8 +41,8 @@ class _SignInState extends State<SignIn> {
                           fontWeight: FontWeight.bold,
                           fontStyle: FontStyle.italic),
                     ),
-                    _textInput(hint: "Usuario", icon: Icons.person),
-                    _textInput(hint: "Contraseña", icon: Icons.lock),
+                    textInput(hint: "Usuario", icon: Icons.person, top: 50.0),
+                    textInput(hint: "Contraseña", icon: Icons.lock, top: 50.0),
                     Container(
                         margin: EdgeInsets.only(top: 20),
                         child: TextButton(
@@ -57,8 +58,10 @@ class _SignInState extends State<SignIn> {
                     Container(
                       margin: EdgeInsets.only(top: 1),
                       child: TextButton(
-                        onPressed: () {},
-                        child: Text('¿No posee cuenta?, registrarse',
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/signup');
+                        },
+                        child: Text('¿No posee cuenta?, Registrese',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 15,
@@ -114,22 +117,3 @@ class _SignInState extends State<SignIn> {
   }
 }
 
-Widget _textInput({controller, hint, icon}) {
-  return Container(
-    margin: EdgeInsets.only(top: 50),
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.all(Radius.circular(40)),
-      color: backgroundColor,
-    ),
-    padding: EdgeInsets.only(left: 10),
-    child: TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-          border: InputBorder.none,
-          hintText: hint,
-          prefixIcon: Icon(
-            icon,
-          )),
-    ),
-  );
-}

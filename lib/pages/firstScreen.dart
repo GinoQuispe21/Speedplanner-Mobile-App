@@ -14,8 +14,9 @@ class _FirstScreenState extends State<FirstScreen> {
   void initState() {
     super.initState();
     Timer(const Duration(milliseconds: 5000), () {
-      Navigator.push(context,
-          MaterialPageRoute(builder: (BuildContext context) => SignIn()));
+      //Navigator.push(context,
+          //MaterialPageRoute(builder: (BuildContext context) => SignIn()));
+      Navigator.pushNamed(context, '/signin');
     });
   }
 
