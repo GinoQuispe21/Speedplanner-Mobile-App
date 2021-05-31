@@ -1,24 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:speedplanner/utils/colors.dart';
 
-Widget textInput({controller, hint, icon, top}) {
+Widget normalInput({controller}) {
   return Container(
-    margin: EdgeInsets.only(
-      top: top,
-    ),
     decoration: BoxDecoration(
-      borderRadius: BorderRadius.all(Radius.circular(40)),
+      borderRadius: BorderRadius.all(Radius.circular(15)),
       color: backgroundColor,
     ),
     padding: EdgeInsets.only(left: 2),
     child: TextFormField(
       controller: controller,
       decoration: InputDecoration(
-          border: InputBorder.none,
-          hintText: hint,
-          prefixIcon: Icon(
-            icon,
-          )),
+        border: InputBorder.none,
+      ),
     ),
   );
 }
