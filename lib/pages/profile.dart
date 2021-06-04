@@ -1,4 +1,14 @@
+import 'dart:ui';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:speedplanner/utils/colors.dart';
+import 'package:speedplanner/utils/dateFooter.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+enum Gender { male, female, others }
 
 class Profile extends StatefulWidget {
   @override
@@ -6,12 +16,422 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+  Gender? _gender;
+  Gender? gValue;
+  String formatter = '';
+  bool fieldsEnabled = false;
+  String editBtnText = 'Editar Perfil';
+  String title = 'Perfil';
+  String user = '';
+  String name = '';
+  String email = '';
+  int age = 0;
+  String gender = '';
+
+  var userTxt = TextEditingController();
+  var nameTxt = TextEditingController();
+  var emailTxt = TextEditingController();
+  var ageTxt = TextEditingController();
+
+  void getDate() {
+    DateTime now = new DateTime.now();
+    formatter = DateFormat('yMMMd').format(now);
+    print(formatter);
+  }
+
+  Future<void> getProfileData() async {
+    try {
+      var url = Uri.parse(
+          'https://speedplanner-mobile.herokuapp.com/api/users/1/profile/');
+
+      http.Response response = await http.get(url, headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization':
+            'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjam1yIn0.40s6zj8GYU5s5m3jTYT_zzqwjB9YdHmK-QZqhUuhM199hNvcGJN0eIPTa4dX3T85KItVbd7VQv7UFZVHl2kwZA'
+      });
+      Map profileData = jsonDecode(response.body);
+
+      name = profileData['fullName'];
+      age = profileData['age'];
+      gender = profileData['gender'];
+
+      setGender();
+
+      print(age);
+      nameTxt.text = name;
+      ageTxt.text = age.toString();
+      print(name);
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+    } catch (e) {
+      print('Caught error: $e');
+    }
+  }
+
+  Future<void> getUserData() async {
+    try {
+      var url =
+          Uri.parse('https://speedplanner-mobile.herokuapp.com/api/users/1');
+
+      http.Response response = await http.get(url, headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization':
+            'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjam1yIn0.40s6zj8GYU5s5m3jTYT_zzqwjB9YdHmK-QZqhUuhM199hNvcGJN0eIPTa4dX3T85KItVbd7VQv7UFZVHl2kwZA'
+      });
+      Map userData = jsonDecode(response.body);
+      print(userData);
+      user = userData['username'];
+      email = userData['email'];
+
+      userTxt.text = user;
+      emailTxt.text = email;
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+    } catch (e) {
+      print('Caught error: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getDate();
+    getProfileData();
+    getUserData();
+  }
+
+  void toggleEditing() {
+    setState(() {
+      fieldsEnabled = !fieldsEnabled;
+
+      if (editBtnText == 'Editar Perfil') {
+        editBtnText = 'Guardar Cambios';
+      } else {
+        editBtnText = 'Editar Perfil';
+      }
+
+      if (title == 'Perfil') {
+        title = 'Editar Perfil';
+      } else {
+        title = 'Perfil';
+      }
+    });
+  }
+
+  void setGender() {
+    setState(() {
+      switch (gender) {
+        case "masculino":
+          {
+            _gender = Gender.male;
+            print("masculino encontrado");
+          }
+          break;
+        case "femenino":
+          {
+            _gender = Gender.female;
+          }
+          break;
+        case "others":
+          {
+            _gender = Gender.others;
+          }
+          break;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-        decoration: BoxDecoration(color: Color(0xffE9EBF8)),
-        child: Center(
-          child: Text('Profile Screen'),
-        ));
+    return Scaffold(
+      backgroundColor: backgroundColor,
+      resizeToAvoidBottomInset: false,
+      body: Container(
+          child: SingleChildScrollView(
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              SizedBox(
+                height: 15,
+              ),
+              Text(
+                title,
+                style: TextStyle(
+                    color: purpleColor,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    fontStyle: FontStyle.italic),
+              ),
+              SizedBox(
+                height: 25,
+              ),
+              Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 34),
+                  child: Text('User',
+                      style: TextStyle(
+                        color: purpleColor,
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        fontStyle: FontStyle.italic,
+                      )),
+                )
+              ]),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.85,
+                child: TextField(
+                  controller: userTxt,
+                  enabled: fieldsEnabled,
+                  style: TextStyle(
+                      color: textFieldColor,
+                      fontFamily: 'Poppins',
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      fontStyle: FontStyle.italic),
+                  decoration: InputDecoration(
+                    filled: true,
+                    contentPadding: EdgeInsets.all(16.0),
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(22),
+                        borderSide:
+                            BorderSide(style: BorderStyle.none, width: 0)),
+                  ),
+                ),
+              ),
+              Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 34),
+                  child: Text('Email',
+                      style: TextStyle(
+                        color: purpleColor,
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        fontStyle: FontStyle.italic,
+                      )),
+                )
+              ]),
+
+              SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.85,
+                  child: TextField(
+                    controller: emailTxt,
+                    enabled: fieldsEnabled,
+                    style: TextStyle(
+                        color: textFieldColor,
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        fontStyle: FontStyle.italic),
+                    decoration: InputDecoration(
+                      filled: true,
+                      contentPadding: EdgeInsets.all(16.0),
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(22),
+                          borderSide:
+                              BorderSide(style: BorderStyle.none, width: 0)),
+                    ),
+                  )),
+
+              Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 34),
+                  child: Text('Name',
+                      style: TextStyle(
+                        color: purpleColor,
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        fontStyle: FontStyle.italic,
+                      )),
+                )
+              ]),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.85,
+                child: TextField(
+                  controller: nameTxt,
+                  enabled: fieldsEnabled,
+                  style: TextStyle(
+                      color: textFieldColor,
+                      fontFamily: 'Poppins',
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      fontStyle: FontStyle.italic),
+                  decoration: InputDecoration(
+                    filled: true,
+                    contentPadding: EdgeInsets.all(16.0),
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(22),
+                        borderSide:
+                            BorderSide(style: BorderStyle.none, width: 0)),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 25,
+              ),
+              Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 34),
+                    child: Text(
+                      'Gender',
+                      style: TextStyle(
+                        color: purpleColor,
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    )),
+              ]),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(
+                      child: RadioListTile<Gender>(
+                    activeColor: purpleColor,
+                    title: Text(
+                      'Male',
+                      style: TextStyle(
+                          color: purpleColor,
+                          fontFamily: 'Poppins',
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic),
+                    ),
+                    value: Gender.male,
+                    groupValue: _gender,
+                    onChanged: (Gender? value) {
+                      setState(() {
+                        _gender = value;
+                      });
+                    },
+                  )),
+                  Flexible(
+                      child: RadioListTile<Gender>(
+                    activeColor: purpleColor,
+                    contentPadding: EdgeInsets.only(right: 10),
+                    title: Text(
+                      'Female',
+                      style: TextStyle(
+                          color: purpleColor,
+                          fontFamily: 'Poppins',
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic),
+                    ),
+                    value: Gender.female,
+                    groupValue: _gender,
+                    onChanged: (Gender? value) {
+                      setState(() {
+                        _gender = value;
+                      });
+                    },
+                  )),
+                  Flexible(
+                      child: RadioListTile<Gender>(
+                    activeColor: purpleColor,
+                    contentPadding: EdgeInsets.only(right: 15),
+                    title: Text(
+                      'Others',
+                      style: TextStyle(
+                          color: purpleColor,
+                          fontFamily: 'Poppins',
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic),
+                    ),
+                    value: Gender.others,
+                    groupValue: _gender,
+                    onChanged: (Gender? value) {
+                      setState(() {
+                        _gender = value;
+                      });
+                    },
+                  )),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(34, 0, 20, 0),
+                    child: Text(
+                      'Age',
+                      style: TextStyle(
+                          color: purpleColor,
+                          fontFamily: 'Poppins',
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 75,
+                    child: TextField(
+                      controller: ageTxt,
+                      enabled: fieldsEnabled,
+                      style: TextStyle(
+                          color: textFieldColor,
+                          fontFamily: 'Poppins',
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic),
+                      decoration: InputDecoration(
+                        filled: true,
+                        contentPadding: EdgeInsets.all(16.0),
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide:
+                                BorderSide(style: BorderStyle.none, width: 0)),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              ElevatedButton(
+                  child: Text(
+                    editBtnText,
+                    style: TextStyle(
+                        color: purpleColor,
+                        fontSize: 16,
+                        fontStyle: FontStyle.italic),
+                  ),
+                  style: ButtonStyle(
+                      padding: MaterialStateProperty.all<EdgeInsets>(
+                          EdgeInsets.fromLTRB(30, 15, 30, 15)),
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(Colors.white),
+                      elevation: MaterialStateProperty.all(0),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                              side: BorderSide(color: purpleColor)))),
+                  onPressed: toggleEditing),
+              SizedBox(
+                height: 67,
+              ),
+
+//Inicio de footer
+
+              Row(
+                children: <Widget>[
+                  dateFooter(
+                      context: context, currentDate: 'Date: ' + formatter),
+                ],
+              )
+            ]),
+      )),
+    );
   }
 }
