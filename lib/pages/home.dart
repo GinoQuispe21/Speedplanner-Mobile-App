@@ -95,7 +95,7 @@ class _HomeState extends State<Home> {
                 size: 50.0,
               ),
             )
-          : Container(),
+          : null,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
             border: Border(

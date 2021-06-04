@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:speedplanner/Services/Login.dart';
 import 'package:speedplanner/utils/colors.dart';
-
 import 'package:speedplanner/pages/home.dart';
 import 'package:speedplanner/utils/textInput.dart';
 
@@ -10,6 +10,30 @@ class SignIn extends StatefulWidget {
 }
 
 class _SignInState extends State<SignIn> {
+  LoginService loginservice = new LoginService();
+  TextEditingController username = TextEditingController();
+  TextEditingController password = TextEditingController();
+  String token = '';
+
+  void _login() async {
+    Token tokenResponse =
+        await loginservice.login(username.text, password.text);
+    setState(() {
+      token = tokenResponse.token;
+    });
+
+    if (token != null) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (BuildContext context) => Home()),
+        (route) => false,
+      );
+      print(token);
+    } else {
+      print("Error al iniciar sesión");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,14 +65,26 @@ class _SignInState extends State<SignIn> {
                           fontWeight: FontWeight.bold,
                           fontStyle: FontStyle.italic),
                     ),
-                    textInput(hint: "Usuario", icon: Icons.person, top: 50.0),
-                    textInput(hint: "Contraseña", icon: Icons.lock, top: 50.0),
+                    textInput(
+                        hint: "Usuario",
+                        icon: Icons.person,
+                        controller: username,
+                        top: 50.0,
+                        type: TextInputType.name,
+                        password: false),
+                    textInput(
+                        hint: "Contraseña",
+                        icon: Icons.lock,
+                        controller: password,
+                        top: 50.0,
+                        type: TextInputType.text,
+                        password: true),
                     Container(
                         margin: EdgeInsets.only(top: 20),
                         child: TextButton(
                             onPressed: () {},
                             child: Text(
-                              'Se me olvido mi contraseña',
+                              'Se me olvidó mi contraseña',
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 15,
@@ -79,17 +115,14 @@ class _SignInState extends State<SignIn> {
                               side: BorderSide(color: Colors.white, width: 1),
                             ),
                             onPressed: () {
-                              Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (BuildContext context) => Home()),
-                                (route) => false,
-                              );
+                              _login();
                             },
                             child: Text(
                               'Iniciar Sesión',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 18),
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontStyle: FontStyle.italic),
                             )))
                   ],
                 ),
