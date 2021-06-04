@@ -79,7 +79,7 @@ class _HomeState extends State<Home> {
         ],
       ),
       body: tabs[_currentIndex],
-      floatingActionButton: _currentIndex == 0
+      floatingActionButton: _currentIndex == 0 && createCourse == false
           ? FloatingActionButton(
               backgroundColor: Color(0x00000000),
               elevation: 0,
@@ -95,7 +95,7 @@ class _HomeState extends State<Home> {
                 size: 50.0,
               ),
             )
-          : Container(),
+          : null,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
             border: Border(
