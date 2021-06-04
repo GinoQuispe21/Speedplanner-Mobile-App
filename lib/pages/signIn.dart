@@ -61,7 +61,7 @@ class _SignInState extends State<SignIn> {
                         onPressed: () {
                           Navigator.pushNamed(context, '/signup');
                         },
-                        child: Text('¿No posee cuenta?, Registrese',
+                        child: Text('¿No posee cuenta?, Regístrese',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 15,
@@ -102,7 +102,7 @@ class _SignInState extends State<SignIn> {
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Text('Un producto echo por'),
+                    Text('Un producto hecho por'),
                     Image(
                         image: AssetImage('assets/fasttech_logo.png'),
                         width: 150,
@@ -116,4 +116,3 @@ class _SignInState extends State<SignIn> {
     );
   }
 }
-
