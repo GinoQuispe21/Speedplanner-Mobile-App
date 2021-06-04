@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -6,7 +5,7 @@ import 'package:speedplanner/Services/Register.dart';
 import 'package:speedplanner/pages/home.dart';
 import 'package:speedplanner/utils/colors.dart';
 import 'package:speedplanner/utils/textInput.dart';
-
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 
 class SignUp extends StatefulWidget {
@@ -30,6 +29,23 @@ class _SignUpState extends State<SignUp> {
         MaterialPageRoute(builder: (BuildContext context) => Home()),
         (route) => false,
       );
+      Fluttertoast.showToast(
+          msg: "Bienvenido a SpeedPlanner",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Color(0xff30B18B),
+          textColor: Colors.white,
+          fontSize: 16.0);
+    } else {
+      Fluttertoast.showToast(
+          msg: "Error al crear usuario",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Color(0xffF87575),
+          textColor: Colors.white,
+          fontSize: 16.0);
     }
   }
 

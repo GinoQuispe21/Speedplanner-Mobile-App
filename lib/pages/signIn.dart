@@ -3,6 +3,7 @@ import 'package:speedplanner/Services/Login.dart';
 import 'package:speedplanner/utils/colors.dart';
 import 'package:speedplanner/pages/home.dart';
 import 'package:speedplanner/utils/textInput.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class SignIn extends StatefulWidget {
   @override
@@ -22,15 +23,30 @@ class _SignInState extends State<SignIn> {
       token = tokenResponse.token;
     });
 
-    if (token != null) {
+    if (token != '') {
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (BuildContext context) => Home()),
         (route) => false,
       );
+      Fluttertoast.showToast(
+          msg: "Bienvenido a SpeedPlanner",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Color(0xff30B18B),
+          textColor: Colors.white,
+          fontSize: 16.0);
       print(token);
     } else {
-      print("Error al iniciar sesión");
+      Fluttertoast.showToast(
+          msg: "Error al iniciar sesión",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Color(0xffF87575),
+          textColor: Colors.white,
+          fontSize: 16.0);
     }
   }
 
