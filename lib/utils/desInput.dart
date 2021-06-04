@@ -3,7 +3,7 @@ import 'package:speedplanner/utils/colors.dart';
 
 Widget desInput({controller}) {
   return Container(
-    height: 75.0,
+    height: 50.0,
     decoration: BoxDecoration(
       borderRadius: BorderRadius.all(Radius.circular(20)),
       color: backgroundColor,

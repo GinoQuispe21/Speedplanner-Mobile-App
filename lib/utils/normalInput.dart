@@ -3,6 +3,7 @@ import 'package:speedplanner/utils/colors.dart';
 
 Widget normalInput({controller}) {
   return Container(
+    height: 25.0,
     decoration: BoxDecoration(
       borderRadius: BorderRadius.all(Radius.circular(15)),
       color: backgroundColor,
