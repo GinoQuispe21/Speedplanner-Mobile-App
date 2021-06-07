@@ -3,6 +3,7 @@ import 'package:speedplanner/utils/colors.dart';
 import 'package:speedplanner/utils/normalInput.dart';
 import 'package:speedplanner/utils/desInput.dart';
 import 'package:speedplanner/utils/miniInput.dart';
+import 'package:speedplanner/pages/courses.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -12,10 +13,6 @@ class AddCourse extends StatefulWidget {
 }
 
 class _AddCourseState extends State<AddCourse> {
-  //var nameText = normalInput();
-  //var descText = desInput();
-  //var emailText = normalInput();
-
   TextEditingController nameText = TextEditingController();
   TextEditingController descText = TextEditingController();
   TextEditingController emailText = TextEditingController();
