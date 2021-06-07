@@ -112,21 +112,12 @@ class _HomeState extends State<Home> {
           iconSize: 20,
           items: [
             BottomNavigationBarItem(
-                icon: Icon(Icons.my_library_books_outlined),
-                title: Text('Courses'),
-                backgroundColor: Colors.blue),
+                icon: Icon(Icons.my_library_books_outlined), label: 'Cursos'),
             BottomNavigationBarItem(
-                icon: Icon(Icons.create_outlined),
-                title: Text('Task'),
-                backgroundColor: Colors.blue),
+                icon: Icon(Icons.create_outlined), label: 'Tareas'),
             BottomNavigationBarItem(
-                icon: Icon(Icons.home_outlined),
-                title: Text('Groups'),
-                backgroundColor: Colors.blue),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.person),
-                title: Text('Profile'),
-                backgroundColor: Colors.blue),
+                icon: Icon(Icons.home_outlined), label: 'Grupos'),
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
           ],
           onTap: (index) {
             setState(() {

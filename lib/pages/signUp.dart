@@ -1,11 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:speedplanner/Services/Register.dart';
 import 'package:speedplanner/pages/home.dart';
 import 'package:speedplanner/utils/colors.dart';
 import 'package:speedplanner/utils/textInput.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:speedplanner/utils/footer.dart';
 import 'package:http/http.dart' as http;
 
 class SignUp extends StatefulWidget {
@@ -144,21 +143,7 @@ class _SignUpState extends State<SignUp> {
                 ),
               ),
             ),
-            Container(
-              color: backgroundColor,
-              height: MediaQuery.of(context).size.height * 0.14,
-              width: MediaQuery.of(context).size.width,
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text('Un producto hecho por'),
-                    Image(
-                        image: AssetImage('assets/fasttech_logo.png'),
-                        width: 150,
-                        height: 40),
-                    Text('©2021')
-                  ]),
-            ),
+            footer(context: context)
           ],
         ),
       ),
