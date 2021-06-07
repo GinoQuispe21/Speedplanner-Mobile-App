@@ -3,6 +3,8 @@ import 'package:speedplanner/utils/colors.dart';
 import 'package:speedplanner/utils/normalInput.dart';
 import 'package:speedplanner/utils/desInput.dart';
 import 'package:speedplanner/utils/miniInput.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class AddCourse extends StatefulWidget {
   @override
@@ -10,6 +12,36 @@ class AddCourse extends StatefulWidget {
 }
 
 class _AddCourseState extends State<AddCourse> {
+  //var nameText = normalInput();
+  //var descText = desInput();
+  //var emailText = normalInput();
+
+  TextEditingController nameText = TextEditingController();
+  TextEditingController descText = TextEditingController();
+  TextEditingController emailText = TextEditingController();
+
+  var url = Uri.parse(
+      'https://speedplanner-mobile.herokuapp.com/api/users/1/courses');
+  Future<http.Response> createCourse(name, description, email) async {
+    http.Response response = await http.post(url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization':
+              'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnaW5vIn0.bCcj99sO-yCeKqTfxBEUMinv8ei5EEsSDZy-mG1tjHaE6Z4Pn9YB7bJCrUOaqp-1pV1vXIBiPcNTY7KFWh12Zw'
+        },
+        body: jsonEncode(<String, String>{
+          'name': name,
+          'description': description,
+          'email': email,
+        }));
+    if (response.statusCode == 200) {
+      print("Curso creado: $name");
+    } else {
+      print("Error en la creación");
+    }
+    return response;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,7 +93,7 @@ class _AddCourseState extends State<AddCourse> {
                         padding: EdgeInsets.only(top: 5),
                         child: Column(
                           children: <Widget>[
-                            normalInput(),
+                            normalInput(controller: nameText),
                           ],
                         )),
                     Padding(
@@ -83,7 +115,7 @@ class _AddCourseState extends State<AddCourse> {
                         padding: EdgeInsets.only(top: 5),
                         child: Column(
                           children: <Widget>[
-                            desInput(),
+                            desInput(controller: descText),
                           ],
                         )),
                     Padding(
@@ -105,7 +137,7 @@ class _AddCourseState extends State<AddCourse> {
                         padding: EdgeInsets.only(top: 5),
                         child: Column(
                           children: <Widget>[
-                            normalInput(),
+                            normalInput(controller: emailText),
                           ],
                         )),
                     Padding(
@@ -196,6 +228,8 @@ class _AddCourseState extends State<AddCourse> {
                         elevation: 0,
                         onPressed: () {
                           // Add your onPressed code here!
+                          createCourse(
+                              nameText.text, descText.text, emailText.text);
                         },
                         label: const Text('Crear Curso'),
                         backgroundColor: backgroundColor,
