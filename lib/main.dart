@@ -8,10 +8,10 @@ import 'package:speedplanner/pages/signUp.dart';
 void main() {
   runApp(MaterialApp(
     theme: ThemeData(fontFamily: 'Poppins'),
-    initialRoute: '/firstScreen',
+    initialRoute: '/',
     routes: {
-      '/': (context) => Home(),
-      '/firstScreen': (context) => FirstScreen(),
+      '/home': (context) => Home(),
+      '/': (context) => FirstScreen(),
       '/signin': (context) => SignIn(),
       '/signup': (context) => SignUp(),
       '/addCourse': (context) => AddCourse(),
