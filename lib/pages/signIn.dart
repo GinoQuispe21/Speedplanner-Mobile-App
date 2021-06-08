@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:speedplanner/Services/Login.dart';
+import 'package:speedplanner/models/TokenUserData.dart';
+import 'package:speedplanner/services/Login.dart';
 import 'package:speedplanner/utils/colors.dart';
 import 'package:speedplanner/pages/home.dart';
 import 'package:speedplanner/utils/footer.dart';
@@ -16,20 +17,36 @@ class _SignInState extends State<SignIn> {
   TextEditingController username = TextEditingController();
   TextEditingController password = TextEditingController();
   String token = '';
+  int id = 0;
+  String usernameData = '';
+  String emailData = '';
+  String passwordData = '';
 
   void _login() async {
-    Token tokenResponse =
+    TokenUserData tokenResponse =
         await loginservice.login(username.text, password.text);
     setState(() {
       token = tokenResponse.token;
+      id = tokenResponse.id;
+      usernameData = tokenResponse.username;
+      emailData = tokenResponse.email;
+      passwordData = tokenResponse.password;
     });
 
-    if (token != '') {
-      Navigator.pushAndRemoveUntil(
+    if (token != null) {
+      /*Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (BuildContext context) => Home()),
+        MaterialPageRoute(
+            builder: (BuildContext context) => Home(id, token, usernameData)),
         (route) => false,
-      );
+      );*/
+      Navigator.of(context).pushNamedAndRemoveUntil(
+          '/home', (Route<dynamic> route) => false,
+          arguments: {
+            'id': id,
+            'token': token,
+            'usernameData': usernameData,
+          });
       Fluttertoast.showToast(
           msg: "Bienvenido a SpeedPlanner",
           toastLength: Toast.LENGTH_SHORT,
@@ -38,7 +55,11 @@ class _SignInState extends State<SignIn> {
           backgroundColor: Color(0xff30B18B),
           textColor: Colors.white,
           fontSize: 16.0);
-      print(token);
+      /*print(token);
+      print(id);
+      print(usernameData);
+      print(emailData);
+      print(passwordData);*/
     } else {
       Fluttertoast.showToast(
           msg: "Error al iniciar sesión",
