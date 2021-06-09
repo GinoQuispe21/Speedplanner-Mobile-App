@@ -20,23 +20,27 @@ class _HomeState extends State<Home> {
   int _currentIndex = 0;
   Map data = {};
   //bool createCourse = false;
-
   @override
   void initState() {
     super.initState();
     /*print('El id en home es : ${widget.id}');
     print('El token en home es : ${widget.token}');
-    print('El usernameData en home es : ${widget.usernameData}');*/
+    print('El us    ernameData en home es : ${widget.usernameData}');*/
   }
 
   @override
   Widget build(BuildContext context) {
     data = data.isNotEmpty ? data : ModalRoute.of(context).settings.arguments;
+    int id = data['id'];
+    String token = data['token'];
     String name = data['usernameData'];
-    print(data);
+
+    print(data['id']);
+    print(data['token']);
+    print(data['usernameData']);
     final tabs = [
       //createCourse ? AddCourse() : Courses(),
-      Courses(),
+      Courses(id: id, token: token),
       Tasks(),
       Groups(),
       Profile()
