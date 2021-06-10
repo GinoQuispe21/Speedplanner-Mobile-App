@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:speedplanner/models/TokenUserData.dart';
 import 'package:speedplanner/services/Login.dart';
 import 'package:speedplanner/utils/colors.dart';
-import 'package:speedplanner/pages/home.dart';
 import 'package:speedplanner/utils/footer.dart';
 import 'package:speedplanner/utils/textInput.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -21,6 +20,13 @@ class _SignInState extends State<SignIn> {
   String usernameData = '';
   String emailData = '';
   String passwordData = '';
+  bool _isHidden = true;
+
+  void _togglePasswordView() {
+    setState(() {
+      _isHidden = !_isHidden;
+    });
+  }
 
   void _login() async {
     TokenUserData tokenResponse =
@@ -110,13 +116,37 @@ class _SignInState extends State<SignIn> {
                         top: 50.0,
                         type: TextInputType.name,
                         password: false),
-                    textInput(
-                        hint: "Contraseña",
-                        icon: Icons.lock,
-                        controller: password,
+                    Container(
+                      margin: EdgeInsets.only(
                         top: 50.0,
-                        type: TextInputType.text,
-                        password: true),
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(40)),
+                        color: backgroundColor,
+                      ),
+                      padding: EdgeInsets.only(left: 2),
+                      child: TextField(
+                        controller: password,
+                        keyboardType: TextInputType.text,
+                        obscureText: _isHidden,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Contraseña",
+                          prefixIcon: Icon(
+                            Icons.lock,
+                          ),
+                          suffixIcon: IconButton(
+                              icon: Icon(_isHidden
+                                  ? Icons.visibility
+                                  : Icons.visibility_off),
+                              onPressed: () {
+                                setState(() {
+                                  _isHidden = !_isHidden;
+                                });
+                              }),
+                        ),
+                      ),
+                    ),
                     Container(
                         margin: EdgeInsets.only(top: 20),
                         child: TextButton(
