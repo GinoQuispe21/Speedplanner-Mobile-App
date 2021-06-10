@@ -45,7 +45,7 @@ class _CoursesState extends State<Courses> {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 40),
+        padding: const EdgeInsets.only(bottom: 30),
         child: FloatingActionButton(
           heroTag: "btn1",
           backgroundColor: Color(0x00000000),
