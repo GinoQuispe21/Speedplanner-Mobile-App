@@ -122,7 +122,7 @@ class _AddCourseState extends State<AddCourse> {
         }));
     if (response.statusCode == 200) {
       print("Curso creado: $name");
-      /*for (var i = 0; i <= dayArr.length; i++) {
+      for (var i = 0; i < dayArr.length; i++) {
         Map dataCourse = jsonDecode(utf8.decode(response.bodyBytes));
         int idCourse = dataCourse['id'];
         http.Response responseTime = await http.post(
@@ -138,7 +138,10 @@ class _AddCourseState extends State<AddCourse> {
               'startTime': startArr[i],
               'finishTime': finishArr[i],
             }));
-      }*/
+        if (response.statusCode == 200) {
+          print("Tiempo agregado");
+        }
+      }
     } else {
       print("Error en la creación");
     }
@@ -327,7 +330,6 @@ class _AddCourseState extends State<AddCourse> {
                                     dayText.clear();
                                     startText.clear();
                                     finishText.clear();
-                                    print(currentColor.toString());
                                   },
                                   child: const Icon(
                                     Icons.add_circle_outline_sharp,
@@ -384,8 +386,13 @@ class _AddCourseState extends State<AddCourse> {
                         elevation: 0,
                         onPressed: () {
                           // Add your onPressed code here!
+                          String colorString =
+                              currentColor.toString(); // Color(0x12345678)
+                          String valueString =
+                              colorString.split('(0x')[1].split(')')[0];
+                          //print('0x$valueString');
                           createCourse(nameText.text, descText.text,
-                              emailText.text, currentColor.toString());
+                              emailText.text, '0x$valueString');
                         },
                         label: const Text('Crear Curso'),
                         backgroundColor: backgroundColor,
