@@ -43,7 +43,7 @@ class _HomeState extends State<Home> {
       Courses(id: id, token: token),
       Tasks(),
       Groups(),
-      Profile()
+      Profile(id: id, token: token)
     ];
 
     return Scaffold(
