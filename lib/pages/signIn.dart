@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:speedplanner/Services/Login.dart';
+import 'package:speedplanner/models/TokenUserData.dart';
+import 'package:speedplanner/services/Login.dart';
 import 'package:speedplanner/utils/colors.dart';
-import 'package:speedplanner/pages/home.dart';
 import 'package:speedplanner/utils/footer.dart';
 import 'package:speedplanner/utils/textInput.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -16,20 +16,43 @@ class _SignInState extends State<SignIn> {
   TextEditingController username = TextEditingController();
   TextEditingController password = TextEditingController();
   String token = '';
+  int id = 0;
+  String usernameData = '';
+  String emailData = '';
+  String passwordData = '';
+  bool _isHidden = true;
+
+  void _togglePasswordView() {
+    setState(() {
+      _isHidden = !_isHidden;
+    });
+  }
 
   void _login() async {
-    Token tokenResponse =
+    TokenUserData tokenResponse =
         await loginservice.login(username.text, password.text);
     setState(() {
       token = tokenResponse.token;
+      id = tokenResponse.id;
+      usernameData = tokenResponse.username;
+      emailData = tokenResponse.email;
+      passwordData = tokenResponse.password;
     });
 
-    if (token != '') {
-      Navigator.pushAndRemoveUntil(
+    if (token != null) {
+      /*Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (BuildContext context) => Home()),
+        MaterialPageRoute(
+            builder: (BuildContext context) => Home(id, token, usernameData)),
         (route) => false,
-      );
+      );*/
+      Navigator.of(context).pushNamedAndRemoveUntil(
+          '/home', (Route<dynamic> route) => false,
+          arguments: {
+            'id': id,
+            'token': token,
+            'usernameData': usernameData,
+          });
       Fluttertoast.showToast(
           msg: "Bienvenido a SpeedPlanner",
           toastLength: Toast.LENGTH_SHORT,
@@ -38,7 +61,11 @@ class _SignInState extends State<SignIn> {
           backgroundColor: Color(0xff30B18B),
           textColor: Colors.white,
           fontSize: 16.0);
-      print(token);
+      /*print(token);
+      print(id);
+      print(usernameData);
+      print(emailData);
+      print(passwordData);*/
     } else {
       Fluttertoast.showToast(
           msg: "Error al iniciar sesión",
@@ -89,13 +116,37 @@ class _SignInState extends State<SignIn> {
                         top: 50.0,
                         type: TextInputType.name,
                         password: false),
-                    textInput(
-                        hint: "Contraseña",
-                        icon: Icons.lock,
-                        controller: password,
+                    Container(
+                      margin: EdgeInsets.only(
                         top: 50.0,
-                        type: TextInputType.text,
-                        password: true),
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(40)),
+                        color: backgroundColor,
+                      ),
+                      padding: EdgeInsets.only(left: 2),
+                      child: TextField(
+                        controller: password,
+                        keyboardType: TextInputType.text,
+                        obscureText: _isHidden,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Contraseña",
+                          prefixIcon: Icon(
+                            Icons.lock,
+                          ),
+                          suffixIcon: IconButton(
+                              icon: Icon(_isHidden
+                                  ? Icons.visibility
+                                  : Icons.visibility_off),
+                              onPressed: () {
+                                setState(() {
+                                  _isHidden = !_isHidden;
+                                });
+                              }),
+                        ),
+                      ),
+                    ),
                     Container(
                         margin: EdgeInsets.only(top: 20),
                         child: TextButton(

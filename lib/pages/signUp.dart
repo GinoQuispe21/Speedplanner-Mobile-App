@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:speedplanner/Services/Register.dart';
-import 'package:speedplanner/pages/home.dart';
+import 'package:speedplanner/models/TokenUserData.dart';
+import 'package:speedplanner/services/Register.dart';
+//import 'package:speedplanner/pages/home.dart';
 import 'package:speedplanner/utils/colors.dart';
 import 'package:speedplanner/utils/textInput.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -19,15 +20,37 @@ class _SignUpState extends State<SignUp> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
 
+  String token = '';
+  int id = 0;
+  String usernameData = '';
+  String emailData = '';
+  String passwordData = '';
+  bool _isHidden = true;
   void _register() async {
-    http.Response response =
-        await registerService.register(user.text, email.text, password.text);
-    if (response.statusCode == 200) {
-      Navigator.pushAndRemoveUntil(
+    TokenUserData tokenUserData = await registerService.register(
+        fullName.text, user.text, email.text, password.text);
+
+    setState(() {
+      token = tokenUserData.token;
+      id = tokenUserData.id;
+      usernameData = tokenUserData.username;
+      emailData = tokenUserData.email;
+      passwordData = tokenUserData.password;
+    });
+
+    if (token != null) {
+      /*Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (BuildContext context) => Home()),
         (route) => false,
-      );
+      );*/
+      Navigator.of(context).pushNamedAndRemoveUntil(
+          '/home', (Route<dynamic> route) => false,
+          arguments: {
+            'id': id,
+            'token': token,
+            'usernameData': usernameData,
+          });
       Fluttertoast.showToast(
           msg: "Bienvenido a SpeedPlanner",
           toastLength: Toast.LENGTH_SHORT,
@@ -80,7 +103,7 @@ class _SignUpState extends State<SignUp> {
                           fontStyle: FontStyle.italic),
                     ),
                     textInput(
-                        hint: "Nombre",
+                        hint: "Nombre y Apellido",
                         icon: Icons.person,
                         top: 20.0,
                         controller: fullName,
@@ -100,13 +123,37 @@ class _SignUpState extends State<SignUp> {
                         controller: email,
                         type: TextInputType.emailAddress,
                         password: false),
-                    textInput(
-                        hint: "Contraseña",
-                        icon: Icons.lock,
+                    Container(
+                      margin: EdgeInsets.only(
                         top: 20.0,
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(40)),
+                        color: backgroundColor,
+                      ),
+                      padding: EdgeInsets.only(left: 2),
+                      child: TextField(
                         controller: password,
-                        type: TextInputType.text,
-                        password: true),
+                        keyboardType: TextInputType.text,
+                        obscureText: _isHidden,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Contraseña",
+                          prefixIcon: Icon(
+                            Icons.lock,
+                          ),
+                          suffixIcon: IconButton(
+                              icon: Icon(_isHidden
+                                  ? Icons.visibility
+                                  : Icons.visibility_off),
+                              onPressed: () {
+                                setState(() {
+                                  _isHidden = !_isHidden;
+                                });
+                              }),
+                        ),
+                      ),
+                    ),
                     Container(
                       margin: EdgeInsets.only(top: 1),
                       child: TextButton(

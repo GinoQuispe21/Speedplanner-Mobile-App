@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+//!import 'package:speedplanner/utils/AppBar.dart';
 import 'package:speedplanner/utils/colors.dart';
 import 'package:speedplanner/utils/normalInput.dart';
 import 'package:speedplanner/utils/desInput.dart';
@@ -158,7 +159,7 @@ class _AddCourseState extends State<AddCourse> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      //!appBar: appBarSpeedplanner(name: 'ga'),
       body: Container(
         decoration: BoxDecoration(color: Color(0xffE9EBF8)),
         child: Column(
@@ -319,6 +320,7 @@ class _AddCourseState extends State<AddCourse> {
                                 miniInput(
                                     controller: finishText, hint: "Hora fin."),
                                 FloatingActionButton(
+                                  heroTag: "btn2",
                                   backgroundColor: Color(0x00000000),
                                   elevation: 0,
                                   mini: true,
@@ -383,6 +385,7 @@ class _AddCourseState extends State<AddCourse> {
                         ),
                       ),
                       FloatingActionButton.extended(
+                        heroTag: "btn3",
                         elevation: 0,
                         onPressed: () {
                           // Add your onPressed code here!

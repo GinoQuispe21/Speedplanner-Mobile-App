@@ -1,101 +1,54 @@
 import 'package:flutter/material.dart';
-import 'package:speedplanner/pages/addCourse.dart';
 import 'package:speedplanner/pages/courses.dart';
 import 'package:speedplanner/pages/groups.dart';
 import 'package:speedplanner/pages/profile.dart';
 import 'package:speedplanner/pages/tasks.dart';
+import 'package:speedplanner/utils/AppBar.dart';
 
 class Home extends StatefulWidget {
+  /*final int id;
+  final String token;
+  final String usernameData;
+
+  Home(this.id, this.token, this.usernameData, {Key key}) : super(key: key);*/
+
   @override
   _HomeState createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
   int _currentIndex = 0;
-
-  bool createCourse = false;
+  Map data = {};
+  //bool createCourse = false;
+  @override
+  void initState() {
+    super.initState();
+    /*print('El id en home es : ${widget.id}');
+    print('El token en home es : ${widget.token}');
+    print('El us    ernameData en home es : ${widget.usernameData}');*/
+  }
 
   @override
   Widget build(BuildContext context) {
+    data = data.isNotEmpty ? data : ModalRoute.of(context).settings.arguments;
+    int id = data['id'];
+    String token = data['token'];
+    String name = data['usernameData'];
+
+    print(data['id']);
+    print(data['token']);
+    print(data['usernameData']);
     final tabs = [
-      createCourse ? AddCourse() : Courses(),
+      //createCourse ? AddCourse() : Courses(),
+      Courses(id: id, token: token),
       Tasks(),
       Groups(),
       Profile()
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Speedplanner'),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-              gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: <Color>[Color(0xff30B18B), Color(0xff8377d1)],
-          )),
-        ),
-        actions: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(right: 20.0),
-            child: GestureDetector(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(0.0, 20, 10.0, 0),
-                child: Text(
-                  'Lina Montero',
-                  style: TextStyle(
-                    fontFamily: 'Montserrat',
-                    fontSize: 13,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Padding(
-              padding: EdgeInsets.only(right: 10.0),
-              child: GestureDetector(
-                onTap: () {
-                  print("Nueva notificacion");
-                },
-                child: Icon(
-                  Icons.notifications,
-                  size: 26.0,
-                  color: Colors.white,
-                ),
-              )),
-          Padding(
-            padding: EdgeInsets.only(right: 10.0),
-            child: GestureDetector(
-              onTap: () {
-                print("settings");
-              },
-              child: Icon(
-                Icons.more_vert,
-                size: 26.0,
-                color: Colors.white,
-              ),
-            ),
-          )
-        ],
-      ),
+      appBar: appBarSpeedplanner(name: '$name'),
       body: tabs[_currentIndex],
-      floatingActionButton: _currentIndex == 0 && createCourse == false
-          ? FloatingActionButton(
-              backgroundColor: Color(0x00000000),
-              elevation: 0,
-              onPressed: () {
-                //print(createCourse);
-                setState(() {
-                  createCourse = true;
-                });
-              },
-              child: const Icon(
-                Icons.add_circle_outline_sharp,
-                color: Color(0xff8377D1),
-                size: 50.0,
-              ),
-            )
-          : null,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
             border: Border(
