@@ -1,7 +1,7 @@
 class Time {
   int id;
   String day;
-  String startTime;
+  String starterTime;
   String finishTime;
-  Time(this.id, this.day, this.startTime, this.finishTime);
+  Time(this.id, this.day, this.starterTime, this.finishTime);
 }

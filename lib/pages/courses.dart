@@ -24,22 +24,6 @@ class _CoursesState extends State<Courses> {
   List<Course> listCourse = [];
   String formatter = '';
 
-  //*Data creada solo para ejemplo de fechas
-
-  List<Time> listTime = [];
-
-  //!Llamada al servicio de get all times by course Id
-  /*GetAllTimesByUserIdService getAllTimesByUserIdService =
-      new GetAllTimesByUserIdService();
-  List<Time> listTime = [];
-
-  void getTimes(int id, String token) async {
-    await getAllTimesByUserIdService.getAllTimesByUserId(id, token);
-    setState(() {
-      listTime = getAllTimesByUserIdService.listTime;
-    });
-  }*/
-
   void getCurrentDate() async {
     DateTime now = new DateTime.now();
     formatter = DateFormat('yMMMd').format(now);
@@ -51,6 +35,16 @@ class _CoursesState extends State<Courses> {
     setState(() {
       listCourse = getCourses.courses;
     });
+    for (int i = 0; i < listCourse.length; i++) {
+      print(
+          "El curso $i : ${listCourse[i].id} - ${listCourse[i].name} - ${listCourse[i].description} - ${listCourse[i].email}- ${listCourse[i].color}");
+      print("Tamaño de la lista de tiempos: ${listCourse[i].listTimes.length}");
+      print("Lista de fechas del curso:");
+      for (int j = 0; j < listCourse[i].listTimes.length; j++) {
+        print(
+            "Fecha $j: ${listCourse[i].listTimes[j].id} - ${listCourse[i].listTimes[j].day} - ${listCourse[i].listTimes[j].starterTime} - ${listCourse[i].listTimes[j].finishTime}");
+      }
+    }
   }
 
   @override
@@ -68,11 +62,10 @@ class _CoursesState extends State<Courses> {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 30),
+        padding: const EdgeInsets.only(bottom: 35),
         child: FloatingActionButton(
           heroTag: "btn1",
           backgroundColor: Color(0x00000000),
-          elevation: 0,
           onPressed: () {
             Navigator.pushNamed(context, '/addCourse', arguments: {
               'id': widget.id,
@@ -113,7 +106,7 @@ class _CoursesState extends State<Courses> {
                             child: ListView.builder(
                               itemCount: listCourse.length,
                               itemBuilder: (context, index) {
-                                return cardCourse(listCourse[index], listTime);
+                                return cardCourse(listCourse[index]);
                               },
                             ),
                           ),
@@ -133,7 +126,7 @@ class _CoursesState extends State<Courses> {
   }
 }
 
-Widget cardCourse(Course course, List<Time> listTime) {
+Widget cardCourse(Course course) {
   int colorCard = int.parse(course.color);
 
   return Container(
@@ -144,7 +137,7 @@ Widget cardCourse(Course course, List<Time> listTime) {
           decoration: BoxDecoration(color: Color(colorCard)),
           child: Padding(
             //padding: const EdgeInsets.all(36.0),
-            padding: const EdgeInsets.fromLTRB(15.0, 20.0, 15.0, 20.0),
+            padding: const EdgeInsets.fromLTRB(15.0, 20.0, 15.0, 5),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,12 +162,23 @@ Widget cardCourse(Course course, List<Time> listTime) {
                   padding: const EdgeInsets.only(left: 10.0, top: 5.0),
                   child: Row(
                     children: <Widget>[
-                      Text(
-                        "Lunes -> 09:00 - 11:00",
-                        style: TextStyle(color: Colors.white),
+                      Container(
+                        height: 70,
+                        width: 160,
+                        child: ListView.builder(
+                            itemCount: course.listTimes.length,
+                            itemBuilder: (BuildContext context, int index2) {
+                              return Container(
+                                child: Text(
+                                  '${course.listTimes[index2].day} -> ${course.listTimes[index2].starterTime} - ${course.listTimes[index2].finishTime}',
+                                  style: TextStyle(
+                                      fontSize: 13, color: Colors.white),
+                                ),
+                              );
+                            }),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(left: 50),
+                        padding: const EdgeInsets.only(left: 45, bottom: 30),
                         child: Container(
                           height: 33,
                           width: 130,
