@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:speedplanner/Services/ProfileService.dart';
 import 'package:speedplanner/utils/colors.dart';
 import 'package:speedplanner/utils/dateFooter.dart';
 import 'package:http/http.dart' as http;
@@ -26,23 +27,14 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   UserService userService = new UserService();
+  ProfileService profileService = new ProfileService();
+
   Gender _gender;
   Gender gValue;
   String formatter = '';
   bool fieldsEnabled = false;
   String editBtnText = 'Editar Perfil';
   String title = 'Perfil';
-
-  String name = '';
-
-  int age = 0;
-  String gender = '';
-
-  String putUser = '';
-  String putName = '';
-  String putEmail = '';
-  String putAge = '';
-  String putGender = '';
 
   var userTxt = TextEditingController();
   var nameTxt = TextEditingController();
@@ -55,86 +47,24 @@ class _ProfileState extends State<Profile> {
     print(formatter);
   }
 
-  Future<void> getProfileData(id, token) async {
-    try {
-      var url = Uri.parse(
-          'https://speedplanner-mobile.herokuapp.com/api/users/$id/profile/');
-
-      http.Response response = await http.get(url, headers: <String, String>{
-        'Content-Type': 'application/json',
-        'Authorization': token
-      });
-      Map profileData = jsonDecode(response.body);
-
-      name = profileData['fullName'];
-      age = profileData['age'];
-      gender = profileData['gender'];
-
-      setGender();
-
-      print(age);
-      nameTxt.text = name;
-      ageTxt.text = age.toString();
-      print(name);
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-    } catch (e) {
-      print('Caught error: $e');
-    }
-  }
-
   void getUserData() async {
     await userService.getUserData(widget.id, widget.token);
     userTxt.text = userService.user;
     emailTxt.text = userService.email;
   }
 
-  Future<void> updateUserData(id, token) async {
-    try {
-      var url = Uri.parse(
-          'https://speedplanner-mobile.herokuapp.com/api/users/$id/fields');
-
-      http.Response response = await http.put(url,
-          headers: <String, String>{
-            'Content-Type': 'application/json',
-            'Authorization': token
-          },
-          body: jsonEncode(
-              <String, String>{'username': putUser, 'email': putEmail}));
-      print('PUT user Response status: ${response.statusCode}');
-      print('PUT user Response: ${response.body}');
-      print('updated data');
-    } catch (e) {
-      print('Caught error: $e');
-    }
-  }
-
-  Future<void> updateProfileData(id, token) async {
-    try {
-      var url = Uri.parse(
-          'https://speedplanner-mobile.herokuapp.com/api/users/$id/profile/');
-
-      http.Response response = await http.put(url,
-          headers: <String, String>{
-            'Content-Type': 'application/json',
-            'Authorization': token
-          },
-          body: jsonEncode(<String, String>{
-            'fullName': putName,
-            'age': putAge,
-            'gender': putGender
-          }));
-      print('PUT name response: ${response.body}');
-    } catch (e) {
-      print('Caught error: $e');
-    }
+  void getProfileData() async {
+    await profileService.getProfileData(widget.id, widget.token);
+    nameTxt.text = profileService.name;
+    ageTxt.text = profileService.age.toString();
+    setGender();
   }
 
   @override
   void initState() {
     super.initState();
     getDate();
-    getProfileData(widget.id, widget.token);
+    getProfileData();
     getUserData();
   }
 
@@ -158,7 +88,7 @@ class _ProfileState extends State<Profile> {
 
   void setGender() {
     setState(() {
-      switch (gender.toLowerCase()) {
+      switch (profileService.gender.toLowerCase()) {
         case "masculino":
           {
             _gender = Gender.male;
@@ -183,31 +113,31 @@ class _ProfileState extends State<Profile> {
     switch (_gender) {
       case Gender.male:
         {
-          putGender = "Masculino";
+          profileService.putGender = "Masculino";
         }
         break;
       case Gender.female:
         {
-          putGender = "Femenino";
+          profileService.putGender = "Femenino";
         }
         break;
       case Gender.others:
         {
-          putGender = "Others";
+          profileService.putGender = "Others";
         }
         break;
     }
   }
 
-  void updateFields() {
-    putUser = userTxt.text;
-    putEmail = emailTxt.text;
-    putName = nameTxt.text;
-    putAge = ageTxt.text;
+  void updateFields() async {
+    userService.putUser = userTxt.text;
+    userService.putEmail = emailTxt.text;
+    profileService.putName = nameTxt.text;
+    profileService.putAge = ageTxt.text;
     updateGender();
 
-    updateUserData(widget.id, widget.token);
-    updateProfileData(widget.id, widget.token);
+    await userService.updateUserData(widget.id, widget.token);
+    await profileService.updateProfileData(widget.id, widget.token);
   }
 
   bool anyFieldEmpty() {
