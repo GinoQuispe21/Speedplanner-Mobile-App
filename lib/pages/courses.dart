@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:speedplanner/models/Course.dart';
+import 'package:speedplanner/models/Time.dart';
+//?import 'package:speedplanner/models/Time.dart';
 import 'package:speedplanner/services/GetAllCourses.dart';
+//?import 'package:speedplanner/services/GetAllTimesByCourseId.dart';
 import 'package:speedplanner/utils/dateFooter.dart';
 
 class Courses extends StatefulWidget {
@@ -18,6 +21,23 @@ class _CoursesState extends State<Courses> {
   GetAllCoursesByUserIdService getCourses = new GetAllCoursesByUserIdService();
   List<Course> listCourse = [];
   String formatter = '';
+
+  //*Data creada solo para ejemplo de fechas
+
+  List<Time> listTime = [];
+
+  //!Llamada al servicio de get all times by course Id
+  /*GetAllTimesByUserIdService getAllTimesByUserIdService =
+      new GetAllTimesByUserIdService();
+  List<Time> listTime = [];
+
+  void getTimes(int id, String token) async {
+    await getAllTimesByUserIdService.getAllTimesByUserId(id, token);
+    setState(() {
+      listTime = getAllTimesByUserIdService.listTime;
+    });
+  }*/
+
   void getCurrentDate() async {
     DateTime now = new DateTime.now();
     formatter = DateFormat('yMMMd').format(now);
@@ -86,7 +106,7 @@ class _CoursesState extends State<Courses> {
                             child: ListView.builder(
                               itemCount: listCourse.length,
                               itemBuilder: (context, index) {
-                                return cardCourse(listCourse[index]);
+                                return cardCourse(listCourse[index], listTime);
                               },
                             ),
                           ),
@@ -106,21 +126,74 @@ class _CoursesState extends State<Courses> {
   }
 }
 
-Widget cardCourse(Course course) {
+Widget cardCourse(Course course, List<Time> listTime) {
+  int colorCard = int.parse(course.color);
+
   return Container(
     child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 1.0, horizontal: 4.0),
       child: Card(
         child: Container(
-          decoration: BoxDecoration(color: Color(0xff80C3B5)),
+          decoration: BoxDecoration(color: Color(colorCard)),
           child: Padding(
-            padding: const EdgeInsets.all(36.0),
+            //padding: const EdgeInsets.all(36.0),
+            padding: const EdgeInsets.fromLTRB(15.0, 20.0, 15.0, 20.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text('${course.name}'),
-                Text('${course.description}'),
+                Text(
+                  '${course.name}',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      decoration: TextDecoration.underline,
+                      fontWeight: FontWeight.bold,
+                      fontStyle: FontStyle.italic),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 10.0, top: 5.0),
+                  child: Text(
+                    '${course.description}',
+                    style: TextStyle(color: Colors.white, fontSize: 13),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 10.0, top: 5.0),
+                  child: Row(
+                    children: <Widget>[
+                      Text(
+                        "Lunes -> 09:00 - 11:00",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 50),
+                        child: Container(
+                          height: 33,
+                          width: 130,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.all(Radius.circular(40)),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 1),
+                            child: TextButton(
+                              style: TextButton.styleFrom(),
+                              onPressed: () {},
+                              child: Text(
+                                'Ver Detalles',
+                                style: TextStyle(
+                                    color: Color(colorCard),
+                                    fontSize: 13,
+                                    fontStyle: FontStyle.italic),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                )
               ],
             ),
           ),
