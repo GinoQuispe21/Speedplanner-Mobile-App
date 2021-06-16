@@ -51,7 +51,7 @@ class _ProfileState extends State<Profile> {
   Future<void> getProfileData() async {
     try {
       var url = Uri.parse(
-          'https://speedplanner-mobile.herokuapp.com/api/users/1/profile/');
+          'https://speedplanner-mobile.herokuapp.com/api/users/2/profile/');
 
       http.Response response = await http.get(url, headers: <String, String>{
         'Content-Type': 'application/json',
@@ -80,7 +80,7 @@ class _ProfileState extends State<Profile> {
   Future<void> getUserData() async {
     try {
       var url =
-          Uri.parse('https://speedplanner-mobile.herokuapp.com/api/users/1');
+          Uri.parse('https://speedplanner-mobile.herokuapp.com/api/users/2');
 
       http.Response response = await http.get(url, headers: <String, String>{
         'Content-Type': 'application/json',
@@ -105,7 +105,7 @@ class _ProfileState extends State<Profile> {
   Future<void> updateUserData() async {
     try {
       var url = Uri.parse(
-          'https://speedplanner-mobile.herokuapp.com/api/users/1/fields');
+          'https://speedplanner-mobile.herokuapp.com/api/users/2/fields');
 
       http.Response response = await http.put(url,
           headers: <String, String>{
@@ -126,7 +126,7 @@ class _ProfileState extends State<Profile> {
   Future<void> updateProfileData() async {
     try {
       var url = Uri.parse(
-          'https://speedplanner-mobile.herokuapp.com/api/users/1/profile/');
+          'https://speedplanner-mobile.herokuapp.com/api/users/2/profile/');
 
       http.Response response = await http.put(url,
           headers: <String, String>{
@@ -404,7 +404,7 @@ class _ProfileState extends State<Profile> {
                                 ),
                                 value: Gender.male,
                                 groupValue: _gender,
-                                onChanged: (Gender? value) {
+                                onChanged: (Gender value) {
                                   setState(() {
                                     if (fieldsEnabled) _gender = value;
                                   });
@@ -429,7 +429,7 @@ class _ProfileState extends State<Profile> {
                           ),
                           value: Gender.female,
                           groupValue: _gender,
-                          onChanged: (Gender? value) {
+                          onChanged: (Gender value) {
                             setState(() {
                               if (fieldsEnabled) _gender = value;
                             });
@@ -455,7 +455,7 @@ class _ProfileState extends State<Profile> {
                                 ),
                                 value: Gender.others,
                                 groupValue: _gender,
-                                onChanged: (Gender? value) {
+                                onChanged: (Gender value) {
                                   setState(() {
                                     if (fieldsEnabled) _gender = value;
                                   });
@@ -503,7 +503,7 @@ class _ProfileState extends State<Profile> {
                     ],
                   ),
                   SizedBox(
-                    height: 20,
+                    height: 10,
                   ),
                   ElevatedButton(
                       child: Text(
@@ -535,11 +535,9 @@ class _ProfileState extends State<Profile> {
                         }
                       }),
                   SizedBox(
-                    height: 67,
+                    height: 15,
                   ),
-
 //Inicio de footer
-
                   Row(
                     children: <Widget>[
                       dateFooter(

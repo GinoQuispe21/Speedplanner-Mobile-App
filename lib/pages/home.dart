@@ -47,7 +47,7 @@ class _HomeState extends State<Home> {
     ];
 
     return Scaffold(
-      appBar: appBarSpeedplanner(name: '$name'),
+      appBar: appBarSpeedplanner('$name'),
       body: tabs[_currentIndex],
       bottomNavigationBar: Container(
         decoration: BoxDecoration(

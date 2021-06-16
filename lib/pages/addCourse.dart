@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:speedplanner/utils/AppBar.dart';
 //!import 'package:speedplanner/utils/AppBar.dart';
 import 'package:speedplanner/utils/colors.dart';
 import 'package:speedplanner/utils/normalInput.dart';
@@ -141,6 +142,7 @@ class _AddCourseState extends State<AddCourse> {
             }));
         if (response.statusCode == 200) {
           print("Tiempo agregado");
+          Navigator.pop(context, '/addCourse');
         }
       }
     } else {
@@ -159,7 +161,7 @@ class _AddCourseState extends State<AddCourse> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //!appBar: appBarSpeedplanner(name: 'ga'),
+      appBar: appBarSpeedplanner('Calixto21'),
       body: Container(
         decoration: BoxDecoration(color: Color(0xffE9EBF8)),
         child: Column(
