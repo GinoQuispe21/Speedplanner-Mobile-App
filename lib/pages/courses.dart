@@ -10,8 +10,10 @@ import 'package:speedplanner/utils/dateFooter.dart';
 class Courses extends StatefulWidget {
   final int id;
   final String token;
+  final String username;
 
-  const Courses({this.id, this.token, Key key}) : super(key: key);
+  const Courses({this.id, this.token, this.username, Key key})
+      : super(key: key);
 
   @override
   _CoursesState createState() => _CoursesState();
@@ -57,6 +59,7 @@ class _CoursesState extends State<Courses> {
     getCurrentDate();
     print('El id en Course es : ${widget.id}');
     print('El token en Course es : ${widget.token}');
+    print('El nombre del usuario es : ${widget.username}');
     getCourse();
   }
 
@@ -71,7 +74,11 @@ class _CoursesState extends State<Courses> {
           backgroundColor: Color(0x00000000),
           elevation: 0,
           onPressed: () {
-            Navigator.pushNamed(context, '/addCourse');
+            Navigator.pushNamed(context, '/addCourse', arguments: {
+              'id': widget.id,
+              'token': widget.token,
+              'username': widget.username
+            });
           },
           child: const Icon(
             Icons.add_circle,

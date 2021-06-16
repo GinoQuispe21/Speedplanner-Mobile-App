@@ -10,6 +10,13 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class AddCourse extends StatefulWidget {
+  final int id;
+  final String token;
+  final String username;
+
+  const AddCourse({this.id, this.token, this.username, Key key})
+      : super(key: key);
+
   @override
   _AddCourseState createState() => _AddCourseState();
 }
@@ -26,6 +33,8 @@ class _AddCourseState extends State<AddCourse> {
   var dayArr = [];
   var startArr = [];
   var finishArr = [];
+
+  Map data = {};
 
   void timeString(TextEditingController day, TextEditingController start,
       TextEditingController finish) {
@@ -106,15 +115,17 @@ class _AddCourseState extends State<AddCourse> {
     return message;
   }
 
-  var urlCourses = Uri.parse(
-      'https://speedplanner-mobile.herokuapp.com/api/users/1/courses');
+  Future<http.Response> createCourse(
+      id, token, name, description, email, color) async {
+    print(id);
+    print(token);
+    var urlCourses = Uri.parse(
+        'https://speedplanner-mobile.herokuapp.com/api/users/$id/courses');
 
-  Future<http.Response> createCourse(name, description, email, color) async {
     http.Response response = await http.post(urlCourses,
         headers: <String, String>{
           'Content-Type': 'application/json',
-          'Authorization':
-              'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnaW5vIn0.bCcj99sO-yCeKqTfxBEUMinv8ei5EEsSDZy-mG1tjHaE6Z4Pn9YB7bJCrUOaqp-1pV1vXIBiPcNTY7KFWh12Zw'
+          'Authorization': token,
         },
         body: jsonEncode(<String, String>{
           'name': name,
@@ -160,8 +171,14 @@ class _AddCourseState extends State<AddCourse> {
 
   @override
   Widget build(BuildContext context) {
+    data = data.isNotEmpty ? data : ModalRoute.of(context).settings.arguments;
+    int id = data['id'];
+    String token = data['token'];
+    String name = data['username'];
+    print(name);
+
     return Scaffold(
-      appBar: appBarSpeedplanner('Calixto21'),
+      appBar: appBarSpeedplanner(name),
       body: Container(
         decoration: BoxDecoration(color: Color(0xffE9EBF8)),
         child: Column(
@@ -176,12 +193,12 @@ class _AddCourseState extends State<AddCourse> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Padding(
-                        padding: EdgeInsets.only(top: 20, bottom: 10),
+                        padding: EdgeInsets.only(top: 10),
                         child: Column(
                           children: <Widget>[
                             Wrap(
                               direction: Axis.horizontal,
-                              spacing: 52.0,
+                              spacing: 30.0,
                               children: [
                                 Text(
                                   'Crear Curso',
@@ -396,7 +413,7 @@ class _AddCourseState extends State<AddCourse> {
                           String valueString =
                               colorString.split('(0x')[1].split(')')[0];
                           //print('0x$valueString');
-                          createCourse(nameText.text, descText.text,
+                          createCourse(id, token, nameText.text, descText.text,
                               emailText.text, '0x$valueString');
                         },
                         label: const Text('Crear Curso'),
@@ -407,7 +424,7 @@ class _AddCourseState extends State<AddCourse> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(top: 35),
+              padding: EdgeInsets.only(top: 65),
               child: Container(
                   color: dateBG,
                   width: double.infinity,
