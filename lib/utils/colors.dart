@@ -7,4 +7,4 @@ Color greyColor = Color(0xff161616);
 Color textFieldColor = Color(0xff707070);
 Color firstChoice = Color(0xff3EAB8B);
 Color dateBG = Color(0xffD7DAEB);
-
+Color alert = Color(0xffF87575);

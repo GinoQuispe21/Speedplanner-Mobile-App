@@ -49,7 +49,7 @@ class ProfileService {
             'age': putAge,
             'gender': putGender
           }));
-      print('PUT name response: ${response.body}');
+      print('PUT profile response: ${response.body}');
     } catch (e) {
       print('Caught error: $e');
     }
