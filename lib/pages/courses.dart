@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:speedplanner/pages/addCourse.dart';
 
 class Courses extends StatefulWidget {
   @override
