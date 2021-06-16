@@ -19,8 +19,8 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  Gender? _gender;
-  Gender? gValue;
+  Gender _gender;
+  Gender gValue;
   String formatter = '';
   bool fieldsEnabled = false;
   String editBtnText = 'Editar Perfil';
