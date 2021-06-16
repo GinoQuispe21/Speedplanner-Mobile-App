@@ -7,6 +7,7 @@ import 'package:speedplanner/utils/colors.dart';
 import 'package:speedplanner/utils/dateFooter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:speedplanner/Services/UserService.dart';
 
 enum Gender { male, female, others }
 
@@ -14,20 +15,26 @@ enum Gender { male, female, others }
 //TODO: Quitar SizedBox del final, alinear widget de fecha abajo
 
 class Profile extends StatefulWidget {
+  final int id;
+  final String token;
+
+  const Profile({this.id, this.token, Key key}) : super(key: key);
+
   @override
   _ProfileState createState() => _ProfileState();
 }
 
 class _ProfileState extends State<Profile> {
+  UserService userService = new UserService();
   Gender _gender;
   Gender gValue;
   String formatter = '';
   bool fieldsEnabled = false;
   String editBtnText = 'Editar Perfil';
   String title = 'Perfil';
-  String user = '';
+
   String name = '';
-  String email = '';
+
   int age = 0;
   String gender = '';
 
@@ -48,15 +55,14 @@ class _ProfileState extends State<Profile> {
     print(formatter);
   }
 
-  Future<void> getProfileData() async {
+  Future<void> getProfileData(id, token) async {
     try {
       var url = Uri.parse(
-          'https://speedplanner-mobile.herokuapp.com/api/users/1/profile/');
+          'https://speedplanner-mobile.herokuapp.com/api/users/$id/profile/');
 
       http.Response response = await http.get(url, headers: <String, String>{
         'Content-Type': 'application/json',
-        'Authorization':
-            'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjam1yIn0.40s6zj8GYU5s5m3jTYT_zzqwjB9YdHmK-QZqhUuhM199hNvcGJN0eIPTa4dX3T85KItVbd7VQv7UFZVHl2kwZA'
+        'Authorization': token
       });
       Map profileData = jsonDecode(response.body);
 
@@ -77,41 +83,21 @@ class _ProfileState extends State<Profile> {
     }
   }
 
-  Future<void> getUserData() async {
-    try {
-      var url =
-          Uri.parse('https://speedplanner-mobile.herokuapp.com/api/users/1');
-
-      http.Response response = await http.get(url, headers: <String, String>{
-        'Content-Type': 'application/json',
-        'Authorization':
-            'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjam1yIn0.40s6zj8GYU5s5m3jTYT_zzqwjB9YdHmK-QZqhUuhM199hNvcGJN0eIPTa4dX3T85KItVbd7VQv7UFZVHl2kwZA'
-      });
-      Map userData = jsonDecode(response.body);
-      print(userData);
-      user = userData['username'];
-      email = userData['email'];
-
-      userTxt.text = user;
-      emailTxt.text = email;
-
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-    } catch (e) {
-      print('Caught error: $e');
-    }
+  void getUserData() async {
+    await userService.getUserData(widget.id, widget.token);
+    userTxt.text = userService.user;
+    emailTxt.text = userService.email;
   }
 
-  Future<void> updateUserData() async {
+  Future<void> updateUserData(id, token) async {
     try {
       var url = Uri.parse(
-          'https://speedplanner-mobile.herokuapp.com/api/users/1/fields');
+          'https://speedplanner-mobile.herokuapp.com/api/users/$id/fields');
 
       http.Response response = await http.put(url,
           headers: <String, String>{
             'Content-Type': 'application/json',
-            'Authorization':
-                'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjam1yIn0.40s6zj8GYU5s5m3jTYT_zzqwjB9YdHmK-QZqhUuhM199hNvcGJN0eIPTa4dX3T85KItVbd7VQv7UFZVHl2kwZA'
+            'Authorization': token
           },
           body: jsonEncode(
               <String, String>{'username': putUser, 'email': putEmail}));
@@ -123,16 +109,15 @@ class _ProfileState extends State<Profile> {
     }
   }
 
-  Future<void> updateProfileData() async {
+  Future<void> updateProfileData(id, token) async {
     try {
       var url = Uri.parse(
-          'https://speedplanner-mobile.herokuapp.com/api/users/1/profile/');
+          'https://speedplanner-mobile.herokuapp.com/api/users/$id/profile/');
 
       http.Response response = await http.put(url,
           headers: <String, String>{
             'Content-Type': 'application/json',
-            'Authorization':
-                'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjam1yIn0.40s6zj8GYU5s5m3jTYT_zzqwjB9YdHmK-QZqhUuhM199hNvcGJN0eIPTa4dX3T85KItVbd7VQv7UFZVHl2kwZA'
+            'Authorization': token
           },
           body: jsonEncode(<String, String>{
             'fullName': putName,
@@ -149,9 +134,8 @@ class _ProfileState extends State<Profile> {
   void initState() {
     super.initState();
     getDate();
-    getProfileData();
+    getProfileData(widget.id, widget.token);
     getUserData();
-    //updateProfileData();
   }
 
   void toggleEditing() {
@@ -222,8 +206,8 @@ class _ProfileState extends State<Profile> {
     putAge = ageTxt.text;
     updateGender();
 
-    updateUserData();
-    updateProfileData();
+    updateUserData(widget.id, widget.token);
+    updateProfileData(widget.id, widget.token);
   }
 
   bool anyFieldEmpty() {
@@ -404,7 +388,7 @@ class _ProfileState extends State<Profile> {
                                 ),
                                 value: Gender.male,
                                 groupValue: _gender,
-                                onChanged: (Gender? value) {
+                                onChanged: (Gender value) {
                                   setState(() {
                                     if (fieldsEnabled) _gender = value;
                                   });
@@ -429,7 +413,7 @@ class _ProfileState extends State<Profile> {
                           ),
                           value: Gender.female,
                           groupValue: _gender,
-                          onChanged: (Gender? value) {
+                          onChanged: (Gender value) {
                             setState(() {
                               if (fieldsEnabled) _gender = value;
                             });
@@ -455,7 +439,7 @@ class _ProfileState extends State<Profile> {
                                 ),
                                 value: Gender.others,
                                 groupValue: _gender,
-                                onChanged: (Gender? value) {
+                                onChanged: (Gender value) {
                                   setState(() {
                                     if (fieldsEnabled) _gender = value;
                                   });
@@ -528,6 +512,7 @@ class _ProfileState extends State<Profile> {
                         if (fieldsEnabled) {
                           toggleEditing();
                           print('actualizando...');
+                          updateFields();
                           print(anyFieldEmpty());
                         } else {
                           toggleEditing();
