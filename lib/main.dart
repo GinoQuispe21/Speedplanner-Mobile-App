@@ -7,6 +7,7 @@ import 'package:speedplanner/pages/signUp.dart';
 
 void main() {
   runApp(MaterialApp(
+    theme: ThemeData(fontFamily: 'Poppins'),
     initialRoute: '/firstScreen',
     routes: {
       '/': (context) => Home(),

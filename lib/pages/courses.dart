@@ -23,7 +23,16 @@ class _CoursesState extends State<Courses> {
         ),*/
         body: Container(
       decoration: BoxDecoration(color: Color(0xffE9EBF8)),
-      child: Text('No hay cursos'),
+      child: Center(
+        child: Text(
+          'Todavía no se han creado Cursos',
+          style: TextStyle(
+              color: Color(0xff9C9DA6),
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              fontStyle: FontStyle.italic),
+        ),
+      ),
     ));
   }
 }
