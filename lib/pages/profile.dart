@@ -475,7 +475,7 @@ class _ProfileState extends State<Profile> {
                     ],
                   ),
                   SizedBox(
-                    height: 20,
+                    height: 10,
                   ),
                   ElevatedButton(
                       child: Text(
@@ -512,11 +512,9 @@ class _ProfileState extends State<Profile> {
                         }
                       }),
                   SizedBox(
-                    height: 67,
+                    height: 15,
                   ),
-
 //Inicio de footer
-
                   Row(
                     children: <Widget>[
                       dateFooter(

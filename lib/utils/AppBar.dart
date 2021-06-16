@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-Widget appBarSpeedplanner({name}) {
+Widget appBarSpeedplanner(name) {
   return AppBar(
     title: Text('Speedplanner'),
     flexibleSpace: Container(

@@ -8,7 +8,7 @@ Widget desInput({controller}) {
       borderRadius: BorderRadius.all(Radius.circular(20)),
       color: backgroundColor,
     ),
-    padding: EdgeInsets.only(left: 2),
+    padding: EdgeInsets.only(left: 5),
     child: TextFormField(
       controller: controller,
       decoration: InputDecoration(

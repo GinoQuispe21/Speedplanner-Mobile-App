@@ -40,14 +40,18 @@ class _HomeState extends State<Home> {
     print(data['usernameData']);
     final tabs = [
       //createCourse ? AddCourse() : Courses(),
-      Courses(id: id, token: token),
+      Courses(
+        id: id,
+        token: token,
+        username: name,
+      ),
       Tasks(),
       Groups(),
       Profile(id: id, token: token)
     ];
 
     return Scaffold(
-      appBar: appBarSpeedplanner(name: '$name'),
+      appBar: appBarSpeedplanner('$name'),
       body: tabs[_currentIndex],
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
