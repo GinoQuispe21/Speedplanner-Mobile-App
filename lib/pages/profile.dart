@@ -3,10 +3,12 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:speedplanner/Services/ProfileService.dart';
 import 'package:speedplanner/utils/colors.dart';
 import 'package:speedplanner/utils/dateFooter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:speedplanner/Services/UserService.dart';
 
 enum Gender { male, female, others }
 
@@ -14,28 +16,25 @@ enum Gender { male, female, others }
 //TODO: Quitar SizedBox del final, alinear widget de fecha abajo
 
 class Profile extends StatefulWidget {
+  final int id;
+  final String token;
+
+  const Profile({this.id, this.token, Key key}) : super(key: key);
+
   @override
   _ProfileState createState() => _ProfileState();
 }
 
 class _ProfileState extends State<Profile> {
+  UserService userService = new UserService();
+  ProfileService profileService = new ProfileService();
+
   Gender _gender;
   Gender gValue;
   String formatter = '';
   bool fieldsEnabled = false;
   String editBtnText = 'Editar Perfil';
   String title = 'Perfil';
-  String user = '';
-  String name = '';
-  String email = '';
-  int age = 0;
-  String gender = '';
-
-  String putUser = '';
-  String putName = '';
-  String putEmail = '';
-  String putAge = '';
-  String putGender = '';
 
   var userTxt = TextEditingController();
   var nameTxt = TextEditingController();
@@ -48,101 +47,17 @@ class _ProfileState extends State<Profile> {
     print(formatter);
   }
 
-  Future<void> getProfileData() async {
-    try {
-      var url = Uri.parse(
-          'https://speedplanner-mobile.herokuapp.com/api/users/2/profile/');
-
-      http.Response response = await http.get(url, headers: <String, String>{
-        'Content-Type': 'application/json',
-        'Authorization':
-            'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjam1yIn0.40s6zj8GYU5s5m3jTYT_zzqwjB9YdHmK-QZqhUuhM199hNvcGJN0eIPTa4dX3T85KItVbd7VQv7UFZVHl2kwZA'
-      });
-      Map profileData = jsonDecode(response.body);
-
-      name = profileData['fullName'];
-      age = profileData['age'];
-      gender = profileData['gender'];
-
-      setGender();
-
-      print(age);
-      nameTxt.text = name;
-      ageTxt.text = age.toString();
-      print(name);
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-    } catch (e) {
-      print('Caught error: $e');
-    }
+  void getUserData() async {
+    await userService.getUserData(widget.id, widget.token);
+    userTxt.text = userService.user;
+    emailTxt.text = userService.email;
   }
 
-  Future<void> getUserData() async {
-    try {
-      var url =
-          Uri.parse('https://speedplanner-mobile.herokuapp.com/api/users/2');
-
-      http.Response response = await http.get(url, headers: <String, String>{
-        'Content-Type': 'application/json',
-        'Authorization':
-            'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjam1yIn0.40s6zj8GYU5s5m3jTYT_zzqwjB9YdHmK-QZqhUuhM199hNvcGJN0eIPTa4dX3T85KItVbd7VQv7UFZVHl2kwZA'
-      });
-      Map userData = jsonDecode(response.body);
-      print(userData);
-      user = userData['username'];
-      email = userData['email'];
-
-      userTxt.text = user;
-      emailTxt.text = email;
-
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-    } catch (e) {
-      print('Caught error: $e');
-    }
-  }
-
-  Future<void> updateUserData() async {
-    try {
-      var url = Uri.parse(
-          'https://speedplanner-mobile.herokuapp.com/api/users/2/fields');
-
-      http.Response response = await http.put(url,
-          headers: <String, String>{
-            'Content-Type': 'application/json',
-            'Authorization':
-                'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjam1yIn0.40s6zj8GYU5s5m3jTYT_zzqwjB9YdHmK-QZqhUuhM199hNvcGJN0eIPTa4dX3T85KItVbd7VQv7UFZVHl2kwZA'
-          },
-          body: jsonEncode(
-              <String, String>{'username': putUser, 'email': putEmail}));
-      print('PUT user Response status: ${response.statusCode}');
-      print('PUT user Response: ${response.body}');
-      print('updated data');
-    } catch (e) {
-      print('Caught error: $e');
-    }
-  }
-
-  Future<void> updateProfileData() async {
-    try {
-      var url = Uri.parse(
-          'https://speedplanner-mobile.herokuapp.com/api/users/2/profile/');
-
-      http.Response response = await http.put(url,
-          headers: <String, String>{
-            'Content-Type': 'application/json',
-            'Authorization':
-                'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjam1yIn0.40s6zj8GYU5s5m3jTYT_zzqwjB9YdHmK-QZqhUuhM199hNvcGJN0eIPTa4dX3T85KItVbd7VQv7UFZVHl2kwZA'
-          },
-          body: jsonEncode(<String, String>{
-            'fullName': putName,
-            'age': putAge,
-            'gender': putGender
-          }));
-      print('PUT name response: ${response.body}');
-    } catch (e) {
-      print('Caught error: $e');
-    }
+  void getProfileData() async {
+    await profileService.getProfileData(widget.id, widget.token);
+    nameTxt.text = profileService.name;
+    ageTxt.text = profileService.age.toString();
+    setGender();
   }
 
   @override
@@ -151,7 +66,6 @@ class _ProfileState extends State<Profile> {
     getDate();
     getProfileData();
     getUserData();
-    //updateProfileData();
   }
 
   void toggleEditing() {
@@ -174,7 +88,7 @@ class _ProfileState extends State<Profile> {
 
   void setGender() {
     setState(() {
-      switch (gender.toLowerCase()) {
+      switch (profileService.gender.toLowerCase()) {
         case "masculino":
           {
             _gender = Gender.male;
@@ -199,31 +113,31 @@ class _ProfileState extends State<Profile> {
     switch (_gender) {
       case Gender.male:
         {
-          putGender = "Masculino";
+          profileService.putGender = "Masculino";
         }
         break;
       case Gender.female:
         {
-          putGender = "Femenino";
+          profileService.putGender = "Femenino";
         }
         break;
       case Gender.others:
         {
-          putGender = "Others";
+          profileService.putGender = "Others";
         }
         break;
     }
   }
 
-  void updateFields() {
-    putUser = userTxt.text;
-    putEmail = emailTxt.text;
-    putName = nameTxt.text;
-    putAge = ageTxt.text;
+  void updateFields() async {
+    userService.putUser = userTxt.text;
+    userService.putEmail = emailTxt.text;
+    profileService.putName = nameTxt.text;
+    profileService.putAge = ageTxt.text;
     updateGender();
 
-    updateUserData();
-    updateProfileData();
+    await userService.updateUserData(widget.id, widget.token);
+    await profileService.updateProfileData(widget.id, widget.token);
   }
 
   bool anyFieldEmpty() {
@@ -232,6 +146,64 @@ class _ProfileState extends State<Profile> {
         emailTxt.text.isEmpty ||
         ageTxt.text.isEmpty ||
         _gender == null;
+  }
+
+  Future<void> _showDialog() async {
+    return showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(
+              'Error',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 26,
+                  fontStyle: FontStyle.italic,
+                  fontWeight: FontWeight.bold),
+            ),
+            titlePadding: EdgeInsets.all(20),
+            content: Container(
+              child: Text('No deje espacios vacíos',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontStyle: FontStyle.italic,
+                      fontWeight: FontWeight.bold)),
+            ),
+            contentPadding: EdgeInsets.all(20),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            backgroundColor: alert,
+            actions: <Widget>[
+              Center(
+                child: ElevatedButton(
+                    child: Text(
+                      'Aceptar',
+                      style: TextStyle(
+                          color: purpleColor,
+                          fontSize: 16,
+                          fontStyle: FontStyle.italic),
+                    ),
+                    style: ButtonStyle(
+                        padding: MaterialStateProperty.all<EdgeInsets>(
+                            EdgeInsets.fromLTRB(30, 15, 30, 15)),
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.white),
+                        elevation: MaterialStateProperty.all(0),
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30.0),
+                                    side: BorderSide(color: alert)))),
+                    onPressed: () => Navigator.pop(context)),
+              )
+            ],
+          );
+        });
   }
 
   @override
@@ -527,8 +499,13 @@ class _ProfileState extends State<Profile> {
                       onPressed: () {
                         if (fieldsEnabled) {
                           toggleEditing();
-                          print('actualizando...');
-                          print(anyFieldEmpty());
+                          if (anyFieldEmpty()) {
+                            print('campo(s) vacíos');
+                            _showDialog();
+                          } else {
+                            print('actualizando...');
+                            updateFields();
+                          }
                         } else {
                           toggleEditing();
                           print('se puede editar');
