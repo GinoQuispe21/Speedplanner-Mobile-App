@@ -14,14 +14,13 @@ Widget appBarSpeedplanner(name) {
     ),
     actions: <Widget>[
       Padding(
-        padding: EdgeInsets.only(right: 20.0),
+        padding: EdgeInsets.only(right: 5.0),
         child: GestureDetector(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(0.0, 20, 10.0, 0),
             child: Text(
               name,
               style: TextStyle(
-                fontFamily: 'Poppins',
                 fontSize: 15,
               ),
             ),
