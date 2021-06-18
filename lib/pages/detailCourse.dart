@@ -1,14 +1,14 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:speedplanner/models/Course.dart';
+import 'package:speedplanner/models/ListTask.dart';
+import 'package:speedplanner/models/SimpleTask.dart';
 import 'package:speedplanner/models/StudyGroup.dart';
+import 'package:speedplanner/models/TimedTask.dart';
 import 'package:speedplanner/pages/createSimpleTask.dart';
 import 'package:speedplanner/services/GetAllGroupsByCourseId.dart';
+import 'package:speedplanner/services/GetSimpleTaskById.dart';
 import 'package:speedplanner/utils/AppBar.dart';
 import 'package:speedplanner/utils/colors.dart';
 import 'package:speedplanner/utils/dateFooter.dart';
@@ -28,7 +28,11 @@ class _DetailCourseState extends State<DetailCourse> {
   String formatter = '';
   double titleSize = 23.0;
   List<StudyGroup> listGroup = [];
+  List<SimpleTask> listSimpleTask = [];
+  List<TimedTask> listTimedTask = [];
+  List<ListTask> listAllTasks = [];
   GroupsService groupsService = new GroupsService();
+  SimpleTaskService simpleTaskService = new SimpleTaskService();
 
   _openPopup(context) {
     Alert(
@@ -56,7 +60,10 @@ class _DetailCourseState extends State<DetailCourse> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => CreateSimpleTask(
-                            token: widget.token, username: widget.username)));
+                              token: widget.token,
+                              username: widget.username,
+                              listGroup: listGroup,
+                            )));
               },
               style: ElevatedButton.styleFrom(
                   primary: Color(0x00000000), shadowColor: Color(0x000000)),
@@ -92,9 +99,14 @@ class _DetailCourseState extends State<DetailCourse> {
     await groupsService.getAllGroupsByCourseId(widget.course.id, widget.token);
     setState(() {
       listGroup = groupsService.studyGroupList;
+      listSimpleTask = groupsService.simpleTaskList;
+      listTimedTask = groupsService.timedTaskList;
+      listAllTasks = groupsService.listAllTasks;
     });
+    print("Lista de grupos");
     for (int i = 0; i < listGroup.length; i++) {
-      print(listGroup[i].name);
+      print(
+          '${listGroup[i].id} - ${listGroup[i].name} - ${listGroup[i].descrpiton}');
     }
   }
 
@@ -103,6 +115,7 @@ class _DetailCourseState extends State<DetailCourse> {
     super.initState();
     getCurrentDate();
     getGroups();
+    //getSimpleTasks();
     print(widget.course.name.length);
     if (widget.course.name.length > 30) {
       titleSize = 18.0;
@@ -153,7 +166,7 @@ class _DetailCourseState extends State<DetailCourse> {
                 top: 20,
                 child: Container(
                     width: size.width,
-                    height: size.height / 10,
+                    height: size.height / 13,
                     decoration: BoxDecoration(color: Color(colorCard)),
                     child: Center(
                       child: Text(
@@ -165,100 +178,183 @@ class _DetailCourseState extends State<DetailCourse> {
                         ),
                       ),
                     ))),
-            Container(
-                height: size.height / 1.8,
-                width: size.width / 1.2,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      "Decripción",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontStyle: FontStyle.italic,
+            Positioned(
+              bottom: 10,
+              child: Container(
+                  height: size.height / 1.4,
+                  width: size.width / 1.2,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        "Decripción",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic,
+                        ),
                       ),
-                    ),
-                    Text(
-                      '${widget.course.description}',
-                      style: TextStyle(),
-                    ),
-                    Divider(
-                      height: 20.0,
-                      thickness: 1.5,
-                      color: Color(0Xff707070),
-                    ),
-                    Text(
-                      "Correo del Docente",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontStyle: FontStyle.italic,
+                      Text(
+                        '${widget.course.description}',
+                        style: TextStyle(),
                       ),
-                    ),
-                    Text('${widget.course.email}'),
-                    Divider(
-                      height: 20.0,
-                      thickness: 1.5,
-                      color: Color(0Xff707070),
-                    ),
-                    Text(
-                      "Horario de clase",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontStyle: FontStyle.italic,
+                      Divider(
+                        height: 20.0,
+                        thickness: 1.5,
+                        color: Color(0Xff707070),
                       ),
-                    ),
-                    Container(
-                      height: 23.0 * (widget.course.listTimes.length),
-                      width: 200,
-                      child: ListView.builder(
-                          itemCount: widget.course.listTimes.length,
+                      Text(
+                        "Correo del Docente",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                      Text(
+                        '${widget.course.email}',
+                        style: TextStyle(
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                      Divider(
+                        height: 20.0,
+                        thickness: 1.5,
+                        color: Color(0Xff707070),
+                      ),
+                      Text(
+                        "Horario de clase",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                      Container(
+                        height: 23.0 * (widget.course.listTimes.length),
+                        width: 200,
+                        child: ListView.builder(
+                            itemCount: widget.course.listTimes.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Text(
+                                  '- ${widget.course.listTimes[index].day} -> ${widget.course.listTimes[index].starterTime} - ${widget.course.listTimes[index].finishTime}');
+                            }),
+                      ),
+                      Divider(
+                        height: 20.0,
+                        thickness: 1.5,
+                        color: Color(0Xff707070),
+                      ),
+                      Text(
+                        "Grupos",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                      Container(
+                        height: listGroup.length * 22.0,
+                        child: ListView.builder(
+                          itemCount: listGroup.length,
                           itemBuilder: (BuildContext context, int index) {
-                            return Text(
-                                '- ${widget.course.listTimes[index].day} -> ${widget.course.listTimes[index].starterTime} - ${widget.course.listTimes[index].finishTime}');
-                          }),
-                    ),
-                    Divider(
-                      height: 20.0,
-                      thickness: 1.5,
-                      color: Color(0Xff707070),
-                    ),
-                    Text(
-                      "Grupos",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontStyle: FontStyle.italic,
+                            return Text('- ${listGroup[index].name}');
+                            //Text('- ${listGroup[index].name}');
+                          },
+                        ),
                       ),
-                    ),
-                    Container(
-                      height: listGroup.length * 20.0,
-                      child: ListView.builder(
-                        itemCount: listGroup.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Text('- ${listGroup[index].name}');
-                        },
+                      Divider(
+                        height: 20.0,
+                        thickness: 1.5,
+                        color: Color(0Xff707070),
                       ),
-                    ),
-                    Divider(
-                      height: 20.0,
-                      thickness: 1.5,
-                      color: Color(0Xff707070),
-                    ),
-                    Text(
-                      "Tareas",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontStyle: FontStyle.italic,
+                      Row(
+                        children: <Widget>[
+                          Text(
+                            "Tareas",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Text('${listAllTasks.length} por realizar',
+                              style: TextStyle(
+                                fontStyle: FontStyle.italic,
+                              ))
+                        ],
                       ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Center(
-                      child: Text("No se han programado tareas"),
-                    )
-                  ],
-                )),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Container(
+                        child: listSimpleTask.length == 0
+                            ? Center(
+                                child: Text("No se han programado tareas"),
+                              )
+                            : Container(
+                                height: listAllTasks.length * 30.0,
+                                child: ListView.builder(
+                                    itemCount: listAllTasks.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      return Padding(
+                                        padding: const EdgeInsets.only(top: 5),
+                                        child: Row(
+                                          children: <Widget>[
+                                            Container(
+                                              height: 25,
+                                              width: 25,
+                                              child: IconButton(
+                                                padding:
+                                                    new EdgeInsets.all(0.0),
+                                                icon: Icon(listAllTasks[index]
+                                                        .finished
+                                                    ? Icons.check_box
+                                                    : Icons
+                                                        .check_box_outline_blank),
+                                                //.check_box_outline_blank,
+                                                //Icons.check_box,
+                                                onPressed: () {
+                                                  setState(() {
+                                                    listAllTasks[index]
+                                                            .finished =
+                                                        !listAllTasks[index]
+                                                            .finished;
+                                                    print(
+                                                        listAllTasks[index].id);
+                                                  });
+                                                },
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 20, right: 20),
+                                              child: Text(
+                                                "${listAllTasks[index].title} ${listAllTasks[index].type}",
+                                                style: TextStyle(fontSize: 12),
+                                              ),
+                                            ),
+                                            Container(
+                                              height: 25,
+                                              width: 25,
+                                              child: IconButton(
+                                                  padding:
+                                                      new EdgeInsets.all(0.0),
+                                                  icon: Icon(
+                                                    Icons.edit_sharp,
+                                                    size: 20,
+                                                  ),
+                                                  onPressed: () {}),
+                                            )
+                                          ],
+                                        ),
+                                      );
+                                    }),
+                              ),
+                      )
+                    ],
+                  )),
+            ),
             Positioned(
                 bottom: 0,
                 child: dateFooter(
