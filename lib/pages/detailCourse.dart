@@ -1,8 +1,14 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:speedplanner/models/Course.dart';
+import 'package:speedplanner/models/StudyGroup.dart';
 import 'package:speedplanner/pages/createSimpleTask.dart';
+import 'package:speedplanner/services/GetAllGroupsByCourseId.dart';
 import 'package:speedplanner/utils/AppBar.dart';
 import 'package:speedplanner/utils/colors.dart';
 import 'package:speedplanner/utils/dateFooter.dart';
@@ -21,6 +27,9 @@ class DetailCourse extends StatefulWidget {
 class _DetailCourseState extends State<DetailCourse> {
   String formatter = '';
   double titleSize = 23.0;
+  List<StudyGroup> listGroup = [];
+  GroupsService groupsService = new GroupsService();
+
   _openPopup(context) {
     Alert(
         context: context,
@@ -79,10 +88,21 @@ class _DetailCourseState extends State<DetailCourse> {
     print(formatter);
   }
 
+  void getGroups() async {
+    await groupsService.getAllGroupsByCourseId(widget.course.id, widget.token);
+    setState(() {
+      listGroup = groupsService.studyGroupList;
+    });
+    for (int i = 0; i < listGroup.length; i++) {
+      print(listGroup[i].name);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     getCurrentDate();
+    getGroups();
     print(widget.course.name.length);
     if (widget.course.name.length > 30) {
       titleSize = 18.0;
@@ -210,8 +230,14 @@ class _DetailCourseState extends State<DetailCourse> {
                         fontStyle: FontStyle.italic,
                       ),
                     ),
-                    Text(
-                      "- Mi grupo Personal",
+                    Container(
+                      height: listGroup.length * 20.0,
+                      child: ListView.builder(
+                        itemCount: listGroup.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Text('- ${listGroup[index].name}');
+                        },
+                      ),
                     ),
                     Divider(
                       height: 20.0,
@@ -225,6 +251,12 @@ class _DetailCourseState extends State<DetailCourse> {
                         fontStyle: FontStyle.italic,
                       ),
                     ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Center(
+                      child: Text("No se han programado tareas"),
+                    )
                   ],
                 )),
             Positioned(
