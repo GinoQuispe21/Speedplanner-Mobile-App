@@ -6,9 +6,9 @@ import 'package:speedplanner/models/SimpleTask.dart';
 
 class CreateSimpleTaskService {
   //!Corregir y revisar porque no funciona
-  Future<SimpleTask> createSimpleTask(
+  Future<TestSimpleTask> createSimpleTask(
       groupId, token, titleTask, descriptionTask, deadline, finished) async {
-    final simpleTask = new SimpleTask(0, false, '', '', '');
+    final testSimpleTask = new TestSimpleTask();
     try {
       Response responseSimpleTask = await post(
         Uri.parse(
@@ -27,13 +27,13 @@ class CreateSimpleTaskService {
       if (responseSimpleTask.statusCode == 200) {
         Map dataSimpleTask =
             jsonDecode(utf8.decode(responseSimpleTask.bodyBytes));
-        simpleTask.id = dataSimpleTask['id'];
-        simpleTask.finished = dataSimpleTask['finished'];
-        simpleTask.deadline = dataSimpleTask['deadline'];
-        simpleTask.title = dataSimpleTask['title'];
-        simpleTask.description = dataSimpleTask['description'];
+        testSimpleTask.id = dataSimpleTask['id'];
+        testSimpleTask.finished = dataSimpleTask['finished'];
+        testSimpleTask.deadline = dataSimpleTask['deadline'];
+        testSimpleTask.title = dataSimpleTask['title'];
+        testSimpleTask.description = dataSimpleTask['description'];
         print(
-            '${simpleTask.id} - ${simpleTask.finished} - ${simpleTask.deadline} - ${simpleTask.title} -${simpleTask.description}');
+            '${testSimpleTask.id} - ${testSimpleTask.finished} - ${testSimpleTask.deadline} - ${testSimpleTask.title} -${testSimpleTask.description}');
       } else {
         print("aaaaaaaaa");
         print("${finished.toString()}");
@@ -41,7 +41,7 @@ class CreateSimpleTaskService {
         print(titleTask);
         print(descriptionTask);
       }
-      return simpleTask;
+      return testSimpleTask;
     } catch (e) {
       print(e);
       return null;

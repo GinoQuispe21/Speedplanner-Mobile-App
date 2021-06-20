@@ -4,7 +4,9 @@ import 'package:speedplanner/models/SimpleTask.dart';
 import 'package:speedplanner/models/StudyGroup.dart';
 import 'package:speedplanner/services/CreateSimpleTask.dart';
 import 'package:speedplanner/utils/AppBar.dart';
+import 'package:speedplanner/utils/colors.dart';
 import 'package:speedplanner/utils/dateFooter.dart';
+import 'package:speedplanner/utils/showDialogSchedule.dart';
 
 class CreateSimpleTask extends StatefulWidget {
   final String token;
@@ -21,95 +23,33 @@ class _CreateSimpleTaskState extends State<CreateSimpleTask> {
   CreateSimpleTaskService createSimpleTaskService =
       new CreateSimpleTaskService();
   String formatter = '';
-  DateTime selectedDate = DateTime.now();
-  String _selectedTime;
-  List<String> entries = <String>['Mi grupo personal', 'TeamMatch', 'FastTech'];
+  List<StudyGroup> listGroups = [];
   int selectedRadioTile;
   TextEditingController titleTask = TextEditingController();
   TextEditingController descriptionTask = TextEditingController();
   String deadline = '';
   bool finished = false;
+  String timeAux;
+
+  DateTime selectedDate = DateTime.now();
+  final DateFormat dateFormat = DateFormat('yyyy-MM-dd HH:mm');
 
   void _createSimpleTask() async {
-    SimpleTask simpleTask = await createSimpleTaskService.createSimpleTask(
-        widget.listGroup[0],
-        widget.token,
-        titleTask.text,
-        descriptionTask.text,
-        "2021-07-02T10:00:00.000+00:00",
-        false);
-  }
-
-  Future<void> _show() async {
-    final TimeOfDay result = await showTimePicker(
-        context: context,
-        helpText: 'Seleccione la hora:',
-        cancelText: 'Cancelar',
-        confirmText: 'Aceptar',
-        initialTime: TimeOfDay.now(),
-        builder: (context, _) {
-          return MediaQuery(
-              data: MediaQuery.of(context).copyWith(
-                  // Using 12-Hour format
-                  alwaysUse24HourFormat: false),
-              // If you want 24-Hour format, just change alwaysUse24HourFormat to true
-              child: Theme(
-                data: ThemeData.light().copyWith(
-                  colorScheme: ColorScheme.light(
-                    // change the border color
-                    primary: Color(0xff30B18B),
-                    // change the text color
-                    onSurface: Color(0xff8377D1),
-                  ),
-                  textButtonTheme: TextButtonThemeData(
-                    style: TextButton.styleFrom(primary: Colors.blue[300]),
-                  ),
-                  // button colors
-                  buttonTheme: ButtonThemeData(
-                    colorScheme: ColorScheme.light(
-                      primary: Colors.green,
-                    ),
-                  ),
-                ),
-                child: _,
-              ));
-        });
-    if (result != null) {
-      setState(() {
-        _selectedTime = result.format(context);
-      });
+    if (titleTask.text != '' &&
+        descriptionTask.text != '' &&
+        selectedRadioTile != null) {
+      var aux = selectedDate.toString();
+      String date = aux.substring(0, 16);
+      TestSimpleTask simpleTask =
+          await createSimpleTaskService.createSimpleTask(selectedRadioTile,
+              widget.token, titleTask.text, descriptionTask.text, date, false);
+      if (simpleTask.deadline == "2021-07-02T10:00:00.000+00:00") {
+        print("TAREA CREADA DE VERDAD");
+        print(simpleTask.title);
+      }
+    } else {
+      print("ERROR");
     }
-  }
-
-  _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate, // Refer step 1
-        firstDate: DateTime(2000),
-        lastDate: DateTime(2025),
-        helpText: 'Seleccione la fecha:',
-        cancelText: 'Cancelar',
-        confirmText: 'Aceptar',
-        builder: (BuildContext context, Widget child) {
-          return Theme(
-            data: Theme.of(context).copyWith(
-              colorScheme: ColorScheme.light(
-                primary: Color(0xff30B18B), // header background color
-                onPrimary: Colors.white, // header text color
-                onSurface: Colors.black, // body text color
-              ),
-              textButtonTheme: TextButtonThemeData(
-                style: TextButton.styleFrom(primary: Colors.blue[300]),
-              ),
-              dialogBackgroundColor: Color(0XffE9EBF8),
-            ),
-            child: child,
-          );
-        });
-    if (picked != null && picked != selectedDate)
-      setState(() {
-        selectedDate = picked;
-      });
   }
 
   void getCurrentDate() async {
@@ -121,16 +61,21 @@ class _CreateSimpleTaskState extends State<CreateSimpleTask> {
   setSelectedRadioTile(int val) {
     setState(() {
       selectedRadioTile = val;
+      print(
+          "El id de grupo que va a ser referenciado para crear es: $selectedRadioTile");
     });
   }
 
   @override
   void initState() {
     super.initState();
-    selectedRadioTile = 0;
     getCurrentDate();
-    print(widget.token);
-    print('${widget.listGroup[0].id} - ${widget.listGroup[0].name}');
+    listGroups = widget.listGroup;
+    print(selectedRadioTile);
+    for (int i = 0; i < listGroups.length; i++) {
+      print(
+          "Lista de grupos creada: ${listGroups[i].name} - ${listGroups[i].id}");
+    }
   }
 
   @override
@@ -147,11 +92,11 @@ class _CreateSimpleTaskState extends State<CreateSimpleTask> {
               alignment: Alignment.center,
               children: <Widget>[
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 50.0),
+                  padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
                   child: Container(
                     //decoration: BoxDecoration(color: Color(0xffC7C1EB)),
                     width: size.width,
-                    height: size.height / 1.35,
+                    height: size.height / 1.40,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
@@ -221,98 +166,65 @@ class _CreateSimpleTaskState extends State<CreateSimpleTask> {
                               fontStyle: FontStyle.italic,
                               fontWeight: FontWeight.bold,
                             )),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 3),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: <Widget>[
-                              Expanded(
-                                child: Column(
-                                  children: <Widget>[
-                                    ElevatedButton.icon(
-                                      label: Text("Elegir Fecha"),
-                                      onPressed: () => _selectDate(context),
-                                      icon: Icon(Icons.date_range_outlined),
-                                      style: ElevatedButton.styleFrom(
-                                          primary: Color(0xff8377D1),
-                                          shape: StadiumBorder(),
-                                          side: BorderSide(
-                                              color: Colors.white, width: 2),
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 12, vertical: 7),
-                                          textStyle: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.bold)),
-                                    ),
-                                    Text("Fecha seleccionada:"),
-                                    Container(
+                        SizedBox(height: 3),
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Container(
+                                child: ElevatedButton.icon(
+                                  label: Text("Fecha y Hora"),
+                                  onPressed: () async {
+                                    showDateTimeDialog(context,
+                                        initialDate: selectedDate,
+                                        onSelectedDate: (selectedDate) {
+                                      setState(() {
+                                        this.selectedDate = selectedDate;
+                                        print(
+                                            'LA HORA ES:  ${selectedDate.toString()}');
+                                      });
+                                    });
+                                  },
+                                  icon: Icon(Icons.calendar_today_outlined),
+                                  style: ElevatedButton.styleFrom(
+                                      primary: purpleColor,
+                                      shape: StadiumBorder(),
+                                      side: BorderSide(
+                                          color: Colors.white, width: 2),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 5, vertical: 7),
+                                      textStyle: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold)),
+                                ),
+                              ),
+                              flex: 4,
+                            ),
+                            Expanded(
+                              child: Center(
+                                  child: Container(
                                       decoration: BoxDecoration(
-                                        color: Colors.white,
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(15)),
+                                        color: Colors.white,
                                       ),
                                       child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
+                                        padding: const EdgeInsets.only(
+                                            top: 10,
+                                            bottom: 10,
+                                            right: 13,
+                                            left: 13),
                                         child: Text(
-                                          "${selectedDate.toLocal()}"
-                                              .split(' ')[0],
+                                          dateFormat.format(selectedDate),
                                           style: TextStyle(
-                                              fontSize: 15,
-                                              color: Color(0xff8E8E8E)),
+                                              color: Color(0xff737373),
+                                              fontSize: 14),
                                         ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                flex: 2,
-                              ),
-                              Expanded(
-                                child: Column(
-                                  children: <Widget>[
-                                    ElevatedButton.icon(
-                                        label: Text("Elegir Hora"),
-                                        onPressed: _show,
-                                        icon: Icon(Icons.timer_rounded),
-                                        style: ElevatedButton.styleFrom(
-                                            primary: Color(0xff8377D1),
-                                            shape: StadiumBorder(),
-                                            side: BorderSide(
-                                                color: Colors.white, width: 2),
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 13, vertical: 7),
-                                            textStyle: TextStyle(
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.bold))),
-                                    Text("Hora seleccionada:"),
-                                    Container(
-                                      width: 100,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(15)),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Center(
-                                          child: Text(
-                                            _selectedTime != null
-                                                ? _selectedTime
-                                                : '00:00 AM',
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                color: Color(0xff8E8E8E)),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                flex: 2,
-                              ),
-                            ],
-                          ),
+                                      ))),
+                              flex: 5,
+                            ),
+                          ],
                         ),
-                        SizedBox(height: 7),
+                        SizedBox(height: 3),
                         Text('Seleccionar grupo',
                             style: TextStyle(
                               color: Color(0xff8980D3),
@@ -327,21 +239,23 @@ class _CreateSimpleTaskState extends State<CreateSimpleTask> {
                               child: Container(
                                 height: 130,
                                 child: ListView.builder(
-                                    itemCount: entries.length,
+                                    itemCount: listGroups.length,
                                     itemBuilder:
                                         (BuildContext context, int index) {
                                       return Container(
                                         height: 40,
                                         child: RadioListTile(
-                                          value: index,
+                                          value: listGroups[index].id,
                                           groupValue: selectedRadioTile,
                                           onChanged: (val) {
-                                            print("Radio Tile pressed $val");
-                                            setSelectedRadioTile(val);
+                                            print(
+                                                "Radio Tile pressed ${listGroups[index].id}");
+                                            setSelectedRadioTile(
+                                                listGroups[index].id);
                                           },
                                           activeColor: Color(0xff8980D3),
                                           title: Text(
-                                            "${entries[index]}",
+                                            "${listGroups[index].name}",
                                             style: TextStyle(fontSize: 12),
                                           ),
                                         ),
