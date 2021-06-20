@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:speedplanner/models/Course.dart';
-import 'package:speedplanner/models/Time.dart';
+import 'package:speedplanner/pages/detailCourse.dart';
 //?import 'package:speedplanner/models/Time.dart';
 import 'package:speedplanner/services/GetAllCourses.dart';
 //?import 'package:speedplanner/services/GetAllTimesByCourseId.dart';
@@ -106,7 +106,8 @@ class _CoursesState extends State<Courses> {
                             child: ListView.builder(
                               itemCount: listCourse.length,
                               itemBuilder: (context, index) {
-                                return cardCourse(listCourse[index]);
+                                return cardCourse(listCourse[index],
+                                    widget.username, widget.token, context);
                               },
                             ),
                           ),
@@ -126,7 +127,7 @@ class _CoursesState extends State<Courses> {
   }
 }
 
-Widget cardCourse(Course course) {
+Widget cardCourse(Course course, String username, String token, context) {
   int colorCard = int.parse(course.color);
 
   return Container(
@@ -190,7 +191,16 @@ Widget cardCourse(Course course) {
                             padding: const EdgeInsets.only(bottom: 1),
                             child: TextButton(
                               style: TextButton.styleFrom(),
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => DetailCourse(
+                                          course: course,
+                                          token: token,
+                                          username: username)),
+                                );
+                              },
                               child: Text(
                                 'Ver Detalles',
                                 style: TextStyle(
