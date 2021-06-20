@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 
 class Groups extends StatefulWidget {
+  final int id;
+  final String token;
+
+  const Groups({this.id, this.token, Key key}) : super(key: key);
+
   @override
   _GroupsState createState() => _GroupsState();
 }
