@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:speedplanner/models/Course.dart';
 import 'package:speedplanner/pages/detailCourse.dart';
 //?import 'package:speedplanner/models/Time.dart';
 import 'package:speedplanner/services/GetAllCourses.dart';
+import 'package:speedplanner/utils/colors.dart';
 //?import 'package:speedplanner/services/GetAllTimesByCourseId.dart';
 import 'package:speedplanner/utils/dateFooter.dart';
 
@@ -23,6 +26,7 @@ class _CoursesState extends State<Courses> {
   GetAllCoursesByUserIdService getCourses = new GetAllCoursesByUserIdService();
   List<Course> listCourse = [];
   String formatter = '';
+  bool loading = false;
 
   void getCurrentDate() async {
     DateTime now = new DateTime.now();
@@ -50,6 +54,10 @@ class _CoursesState extends State<Courses> {
   @override
   void initState() {
     super.initState();
+    /*Timer(const Duration(milliseconds: 6000), () {
+      loading = true;
+      print(loading);
+    });*/
     getCurrentDate();
     print('El id en Course es : ${widget.id}');
     print('El token en Course es : ${widget.token}');
@@ -80,49 +88,57 @@ class _CoursesState extends State<Courses> {
           ),
         ),
       ),
-      body: listCourse.isEmpty
-          ? notCourses()
-          : Container(
-              height: size.height,
-              width: double.infinity,
-              decoration: BoxDecoration(color: Color(0xffE9EBF8)),
-              child: Container(
-                child: Stack(
-                  children: <Widget>[
-                    Positioned(
-                      child: Column(
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Container(
-                                child: Text(
-                              'Lista de Cursos',
-                              style: TextStyle(fontSize: 18),
-                            )),
+      body:
+          /*loading == true
+          ? Container(
+              decoration: BoxDecoration(color: backgroundColor),
+              child: Center(child: Text("GAAAAAAAAAAAAAA")),
+            )
+          :*/
+          listCourse.isEmpty
+              ? notCourses()
+              : Container(
+                  height: size.height,
+                  width: double.infinity,
+                  decoration: BoxDecoration(color: Color(0xffE9EBF8)),
+                  child: Container(
+                    child: Stack(
+                      children: <Widget>[
+                        Positioned(
+                          child: Column(
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Container(
+                                    child: Text(
+                                  'Lista de Cursos',
+                                  style: TextStyle(fontSize: 18),
+                                )),
+                              ),
+                              Container(
+                                height: size.height / 1.57,
+                                width: double.infinity,
+                                child: ListView.builder(
+                                  itemCount: listCourse.length,
+                                  itemBuilder: (context, index) {
+                                    return cardCourse(listCourse[index],
+                                        widget.username, widget.token, context);
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
-                          Container(
-                            height: size.height / 1.57,
-                            width: double.infinity,
-                            child: ListView.builder(
-                              itemCount: listCourse.length,
-                              itemBuilder: (context, index) {
-                                return cardCourse(listCourse[index],
-                                    widget.username, widget.token, context);
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          child: dateFooter(
+                              context: context,
+                              currentDate: 'Date: ' + formatter),
+                        )
+                      ],
                     ),
-                    Positioned(
-                      bottom: 0,
-                      child: dateFooter(
-                          context: context, currentDate: 'Date: ' + formatter),
-                    )
-                  ],
+                  ),
                 ),
-              ),
-            ),
     );
   }
 }
