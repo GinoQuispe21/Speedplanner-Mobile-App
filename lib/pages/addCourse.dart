@@ -71,45 +71,36 @@ class _AddCourseState extends State<AddCourse> {
   String timeMessage = '';
 
   timeShow(message) {
-    String day, start, finish;
-    String day2, start2, finish2;
-    String day3, start3, finish3;
-
+    // if (dayArr.isEmpty || startArr.isEmpty || finishArr.isEmpty) {
+    //   message = 'No hay cursos disponibles';
+    // } else if (dayArr.length == 1 &&
+    //     startArr.length == 1 &&
+    //     finishArr.length == 1) {
+    //   message = '${dayArr[0]}: ${startArr[0]} - ${finishArr[0]}\n';
+    // } else if (dayArr.length == 2 &&
+    //     startArr.length == 2 &&
+    //     finishArr.length == 2) {
+    //   message = '${dayArr[0]}: ${startArr[0]} - ${finishArr[0]}\n'
+    //       '${dayArr[1]}: ${startArr[1]} - ${finishArr[1]}';
+    // } else if (dayArr.length == 3 &&
+    //     startArr.length == 3 &&
+    //     finishArr.length == 3) {
+    //   message = '${dayArr[0]}: ${startArr[0]} - ${finishArr[0]}\n'
+    //       '${dayArr[1]}: ${startArr[1]} - ${finishArr[1]}\n'
+    //       '${dayArr[2]}: ${startArr[2]} - ${finishArr[2]}';
+    // }
     if (dayArr.isEmpty || startArr.isEmpty || finishArr.isEmpty) {
       message = 'No hay cursos disponibles';
-    } else if (dayArr.length == 1 &&
-        startArr.length == 1 &&
-        finishArr.length == 1) {
-      day = dayArr[0];
-      start = startArr[0];
-      finish = finishArr[0];
-      message = '$day: $start - $finish\n';
-    } else if (dayArr.length == 2 &&
-        startArr.length == 2 &&
-        finishArr.length == 2) {
-      day = dayArr[0];
-      start = startArr[0];
-      finish = finishArr[0];
-      day2 = dayArr[1];
-      start2 = startArr[1];
-      finish2 = finishArr[1];
-      message = '$day: $start - $finish\n'
-          '$day2: $start2 - $finish2';
-    } else if (dayArr.length == 3 &&
-        startArr.length == 3 &&
-        finishArr.length == 3) {
-      day = dayArr[0];
-      start = startArr[0];
-      finish = finishArr[0];
-      day2 = dayArr[1];
-      start2 = startArr[1];
-      finish2 = finishArr[1];
-      day3 = dayArr[2];
-      start3 = startArr[2];
-      finish3 = finishArr[2];
-      message = '$day: $start - $finish\n'
-          '$day2: $start2 - $finish2\n'
-          '$day3: $start3 - $finish3';
+    } else if (dayArr.length == startArr.length &&
+        finishArr.length == startArr.length) {
+      for (var i = 0; i < dayArr.length; i++) {
+        if (i == 0)
+          message = '${dayArr[i]}: ${startArr[i]} - ${finishArr[i]}\n';
+        else if (i == dayArr.length - 1)
+          message += '${dayArr[i]}: ${startArr[i]} - ${finishArr[i]}';
+        else
+          message += '${dayArr[i]}: ${startArr[i]} - ${finishArr[i]}\n';
+      }
     }
 
     return message;

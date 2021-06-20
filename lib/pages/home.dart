@@ -45,7 +45,10 @@ class _HomeState extends State<Home> {
         token: token,
         username: name,
       ),
-      Tasks(),
+      Tasks(
+        id: id,
+        token: token,
+      ),
       Groups(),
       Profile(id: id, token: token)
     ];
