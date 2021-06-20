@@ -43,10 +43,9 @@ class _CreateSimpleTaskState extends State<CreateSimpleTask> {
       TestSimpleTask simpleTask =
           await createSimpleTaskService.createSimpleTask(selectedRadioTile,
               widget.token, titleTask.text, descriptionTask.text, date, false);
-      if (simpleTask.deadline == "2021-07-02T10:00:00.000+00:00") {
-        print("TAREA CREADA DE VERDAD");
-        print(simpleTask.title);
-      }
+
+      print("TAREA CREADA DE VERDAD");
+      print(simpleTask.title);
     } else {
       print("ERROR");
     }

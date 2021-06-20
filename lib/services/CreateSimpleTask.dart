@@ -5,7 +5,6 @@ import 'package:http/http.dart';
 import 'package:speedplanner/models/SimpleTask.dart';
 
 class CreateSimpleTaskService {
-  //!Corregir y revisar porque no funciona
   Future<TestSimpleTask> createSimpleTask(
       groupId, token, titleTask, descriptionTask, deadline, finished) async {
     final testSimpleTask = new TestSimpleTask();

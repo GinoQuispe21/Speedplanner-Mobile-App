@@ -86,9 +86,9 @@ class _DetailCourseState extends State<DetailCourse> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => CreateTimedTask(
-                            //token: widget.token,
-                            //username: widget.username,
-                            //listGroup: listGroup,
+                              token: widget.token,
+                              username: widget.username,
+                              listGroup: listGroup,
                             )));
               },
               style: ElevatedButton.styleFrom(
