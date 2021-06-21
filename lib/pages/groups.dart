@@ -5,6 +5,7 @@ import 'package:speedplanner/utils/dateFooter.dart';
 import 'package:speedplanner/models/Group.dart';
 import 'package:speedplanner/Services/GroupService.dart';
 import 'package:speedplanner/Services/GetAllCourses.dart';
+import 'package:speedplanner/Services/ProfileService.dart';
 
 class Groups extends StatefulWidget {
   final int id;
@@ -18,10 +19,13 @@ class Groups extends StatefulWidget {
 
 class _GroupsState extends State<Groups> {
   String formatter = '';
-  List<Group> groupList;
+  List<Group> groupList = [];
+  List<String> courseNames = [];
   GetAllCoursesByUserIdService coursesService =
       new GetAllCoursesByUserIdService();
   GroupService groupService = new GroupService();
+  ProfileService profileService = new ProfileService();
+  String name = '';
 
   void getDate() {
     DateTime now = new DateTime.now();
@@ -33,9 +37,38 @@ class _GroupsState extends State<Groups> {
   void initState() {
     super.initState();
     getDate();
-    coursesService.getAllCoursesByUserId(widget.id, widget.token);
-    groupService.getCourseName(widget.id, widget.token, 1);
-    groupService.getGroup(widget.id, widget.token, 1, groupService.courseName);
+    getCourseNames();
+    getGroups();
+    getName();
+  }
+
+  void getCourseNames() async {
+    await coursesService.getAllCoursesByUserId(widget.id, widget.token);
+    setState(() {
+      for (int i = 0; i < coursesService.courses.length; i++) {
+        courseNames.add(coursesService.courses[i].name);
+        print("added " + courseNames[i]);
+      }
+    });
+  }
+
+  void getGroups() async {
+    await groupService.getAllGroups(widget.id, widget.token, 1);
+    setState(() {
+      groupList = groupService.groups;
+      for (int i = 0; i < groupList.length; i++) {
+        //groupList[i].courseName = courseNames[0];
+      }
+      print("gl size:" + groupList.length.toString());
+      print("group size: " + groupService.groups.length.toString());
+    });
+  }
+
+  void getName() async {
+    await profileService.getProfileData(widget.id, widget.token);
+    setState(() {
+      name = profileService.name;
+    });
   }
 
   @override
@@ -73,7 +106,8 @@ class _GroupsState extends State<Groups> {
                       child: ListView.builder(
                           itemCount: groupList.length,
                           itemBuilder: (context, index) {
-                            return groupCard(groupList[index]);
+                            return groupCard(
+                                groupList[index], name, courseNames[index]);
                           }),
                     )
                   ],
@@ -106,7 +140,7 @@ TextStyle groupName() {
       color: Colors.white);
 }
 
-Widget groupCard(Group group) {
+Widget groupCard(Group group, String name, String courseName) {
   return Container(
     child: Column(
       children: <Widget>[
@@ -114,7 +148,7 @@ Widget groupCard(Group group) {
           width: double.infinity,
           decoration: BoxDecoration(color: Color(0xff8377D1)),
           child: Text(
-            'Grupo Personal',
+            '${group.name}',
             textAlign: TextAlign.center,
             style: groupName(),
           ),
@@ -136,7 +170,7 @@ Widget groupCard(Group group) {
                   ],
                 ),
                 Row(
-                  children: [Text('Grupo para uso personal de Lino Montero')],
+                  children: [Text('${group.description}')],
                 ),
                 Divider(
                   height: 20.0,
@@ -146,8 +180,7 @@ Widget groupCard(Group group) {
                 Row(children: [Text('Miembros', style: detailTitles())]),
                 Row(
                   children: [
-                    Text('Lino Montero',
-                        style: TextStyle(fontStyle: FontStyle.italic))
+                    Text(name, style: TextStyle(fontStyle: FontStyle.italic))
                   ],
                 ),
                 Row(
@@ -174,7 +207,7 @@ Widget groupCard(Group group) {
                 Row(
                   children: [
                     Text(
-                      'Aplicaciones para Dispositivos Móviles',
+                      courseName,
                       style: TextStyle(fontStyle: FontStyle.italic),
                     )
                   ],
