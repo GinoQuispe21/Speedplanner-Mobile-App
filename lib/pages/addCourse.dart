@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:speedplanner/utils/AppBar.dart';
 //!import 'package:speedplanner/utils/AppBar.dart';
 import 'package:speedplanner/utils/colors.dart';
@@ -416,7 +417,7 @@ class _AddCourseState extends State<AddCourse> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(top: 65),
+              padding: EdgeInsets.only(top: 85),
               child: Container(
                   color: dateBG,
                   width: double.infinity,

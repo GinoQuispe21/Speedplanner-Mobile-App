@@ -112,16 +112,19 @@ class _TasksState extends State<Tasks> {
                             )),
                           ),
                           Container(
-                            height: size.height / 1.57,
-                            width: double.infinity,
-                            child: ListView.builder(
-                              itemCount: listCoursesGroups.length,
-                              itemBuilder: (context, index) {
-                                return taskCourse(listCoursesGroups[index],
-                                    numTaskPerCourse[index]);
-                              },
-                            ),
-                          ),
+                              height: size.height / 1.57,
+                              width: double.infinity,
+                              child:
+                                  numTaskPerCourse.length == courseCount.length
+                                      ? ListView.builder(
+                                          itemCount: listCoursesGroups.length,
+                                          itemBuilder: (context, index) {
+                                            return taskCourse(
+                                                listCoursesGroups[index],
+                                                numTaskPerCourse[index]);
+                                          },
+                                        )
+                                      : Text("esperando data")),
                         ],
                       ),
                     ),
