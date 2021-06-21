@@ -170,6 +170,7 @@ class _AddCourseState extends State<AddCourse> {
 
     return Scaffold(
       appBar: appBarSpeedplanner(name),
+      resizeToAvoidBottomInset: false,
       body: Container(
         decoration: BoxDecoration(color: Color(0xffE9EBF8)),
         child: Column(

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:speedplanner/Services/GetTasksByGroupId.dart';
 
 import 'package:speedplanner/Services/getAllGroupsByCourseId.dart';
 import 'package:speedplanner/models/CourseGroup.dart';
 import 'package:speedplanner/models/Group.dart';
 import 'package:speedplanner/models/GroupList.dart';
+import 'package:speedplanner/utils/dateFooter.dart';
 import 'package:speedplanner/utils/dateFooter.dart';
 
 class Tasks extends StatefulWidget {
@@ -25,21 +27,34 @@ class _TasksState extends State<Tasks> {
   List<Group> listTasks = [];
   String formatter = '';
 
+  var courseCount = [];
+  var numTaskPerCourse = [];
+  var cont = 0;
+
+  void getCurrentDate() async {
+    DateTime now = new DateTime.now();
+    formatter = DateFormat('yMMMd').format(now);
+    print(formatter);
+  }
+
   void getCourseAndGroups() async {
     await getGroups.getAllCoursesAndGroupByUserId(widget.id, widget.token);
     setState(() {
       listCoursesGroups = getGroups.courses;
     });
     for (int i = 0; i < listCoursesGroups.length; i++) {
+      courseCount.add(listCoursesGroups[i].name);
       print(
           "El curso $i : ${listCoursesGroups[i].id} - ${listCoursesGroups[i].name} - ${listCoursesGroups[i].description} - ${listCoursesGroups[i].email}- ${listCoursesGroups[i].color}");
       for (int j = 0; j < listCoursesGroups[i].listGroups.length; j++) {
         print(
             "El curso ${listCoursesGroups[i].name} posee el grupo ${listCoursesGroups[i].listGroups[j].id} ${listCoursesGroups[i].listGroups[j].name}");
+        cont++;
       }
     }
 
     for (int i = 0; i < listCoursesGroups.length; i++) {
+      cont = 0;
       for (int j = 0; j < listCoursesGroups[i].listGroups.length; j++) {
         await getTasks.getAllTasksByGroupId(
             listCoursesGroups[i].listGroups[j].id, widget.token);
@@ -49,9 +64,15 @@ class _TasksState extends State<Tasks> {
         for (int k = 0; k < listTasks.length; k++) {
           print(
               "El curso ${listCoursesGroups[i].name} posee ${listTasks[k].id} ${listTasks[k].name} ---> posee ${listTasks[k].listSimpleTasks.length}");
+          for (int j = 0; j < listTasks[j].listSimpleTasks.length; j++) {
+            cont++;
+          }
         }
       }
+      numTaskPerCourse.add(cont);
     }
+    print(courseCount);
+    print(numTaskPerCourse);
   }
 
   void getGroupAndTasks() async {}
@@ -59,6 +80,7 @@ class _TasksState extends State<Tasks> {
   @override
   void initState() {
     super.initState();
+    getCurrentDate();
     // print('El id en Course es : ${widget.id}');
     // print('El token en Course es : ${widget.token}');
     // print('El nombre del usuario es : ${widget.username}');
@@ -95,7 +117,8 @@ class _TasksState extends State<Tasks> {
                             child: ListView.builder(
                               itemCount: listCoursesGroups.length,
                               itemBuilder: (context, index) {
-                                return taskCourse(listCoursesGroups[index]);
+                                return taskCourse(listCoursesGroups[index],
+                                    numTaskPerCourse[index]);
                               },
                             ),
                           ),
@@ -121,7 +144,7 @@ class _TasksState extends State<Tasks> {
 //   )
 // }
 
-Widget taskCourse(CourseGroup course) {
+Widget taskCourse(CourseGroup course, int array) {
   int colorCard = int.parse(course.color);
   for (int i = 0; i < course.listGroups.length; i++) {}
   return Container(
@@ -138,13 +161,50 @@ Widget taskCourse(CourseGroup course) {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    '${course.name}\n',
+                    '${course.name}',
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 15,
                         decoration: TextDecoration.underline,
                         fontWeight: FontWeight.bold,
                         fontStyle: FontStyle.italic),
+                  ),
+                  Text(
+                    'Total de Tareas por realizar: ${array}',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        fontStyle: FontStyle.italic),
+                  ),
+                  Container(
+                    alignment: Alignment.centerRight,
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.only(left: 65, top: 10, bottom: 10),
+                      child: Container(
+                        height: 33,
+                        width: 130,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.all(Radius.circular(40)),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 1),
+                          child: TextButton(
+                            style: TextButton.styleFrom(),
+                            onPressed: () {},
+                            child: Text(
+                              'Ver Tareas',
+                              style: TextStyle(
+                                  color: Color(colorCard),
+                                  fontSize: 13,
+                                  fontStyle: FontStyle.italic),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
