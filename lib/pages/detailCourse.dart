@@ -169,14 +169,28 @@ class _DetailCourseState extends State<DetailCourse> {
       appBar: appBarSpeedplanner('${widget.username}'),
       body: listGroup.length == 0
           ? Container(
-              child: Container(
               decoration: BoxDecoration(color: backgroundColor),
-              child: Center(
-                  child: SpinKitFadingCircle(
-                color: purpleColor,
-                size: 50,
-              )),
-            ))
+              height: size.height,
+              width: double.infinity,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    child: Center(
+                        child: SpinKitFadingCircle(
+                      color: purpleColor,
+                      size: 50,
+                    )),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: Text(
+                      'Cargando detalle del curso',
+                      style: TextStyle(color: purpleColor),
+                    ),
+                  )
+                ],
+              ))
           : Container(
               height: size.height,
               width: double.infinity,
@@ -310,7 +324,7 @@ class _DetailCourseState extends State<DetailCourse> {
                               height: 5,
                             ),
                             Container(
-                              child: listSimpleTask.length == 0
+                              child: listAllTasks.length == 0
                                   ? Center(
                                       child:
                                           Text("No se han programado tareas"),

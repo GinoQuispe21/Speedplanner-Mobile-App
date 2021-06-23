@@ -194,7 +194,7 @@ class _CreateTimedTaskState extends State<CreateTimedTask> {
                             },
                             icon: Icon(Icons.calendar_today_outlined),
                             style: ElevatedButton.styleFrom(
-                                primary: purpleColor,
+                                primary: greenColor,
                                 shape: StadiumBorder(),
                                 side: BorderSide(color: Colors.white, width: 2),
                                 padding: EdgeInsets.symmetric(
@@ -255,7 +255,7 @@ class _CreateTimedTaskState extends State<CreateTimedTask> {
                             },
                             icon: Icon(Icons.calendar_today_outlined),
                             style: ElevatedButton.styleFrom(
-                                primary: purpleColor,
+                                primary: greenColor,
                                 shape: StadiumBorder(),
                                 side: BorderSide(color: Colors.white, width: 2),
                                 padding: EdgeInsets.symmetric(
@@ -290,7 +290,7 @@ class _CreateTimedTaskState extends State<CreateTimedTask> {
                   SizedBox(height: 3),
                   Text('Seleccionar grupo',
                       style: TextStyle(
-                        color: Color(0xff8980D3),
+                        color: greenColor,
                         fontSize: 15,
                         fontStyle: FontStyle.italic,
                         fontWeight: FontWeight.bold,
@@ -315,7 +315,7 @@ class _CreateTimedTaskState extends State<CreateTimedTask> {
                                       setSelectedRadioTile(
                                           listGroups[index].id);
                                     },
-                                    activeColor: Color(0xff8980D3),
+                                    activeColor: greenColor,
                                     title: Text(
                                       "${listGroups[index].name}",
                                       style: TextStyle(fontSize: 12),
@@ -339,7 +339,7 @@ class _CreateTimedTaskState extends State<CreateTimedTask> {
                                     child: Text(
                                       "Crear Grupo",
                                       style: TextStyle(
-                                        color: Color(0xff8980D3),
+                                        color: greenColor,
                                         fontWeight: FontWeight.bold,
                                         fontStyle: FontStyle.italic,
                                       ),
@@ -353,7 +353,7 @@ class _CreateTimedTaskState extends State<CreateTimedTask> {
                                     onPressed: () {},
                                     child: const Icon(
                                       Icons.add_circle_outline_sharp,
-                                      color: Color(0xff8980D3),
+                                      color: Color(0xff2EB18B),
                                       size: 40.0,
                                     ),
                                   ),
@@ -376,7 +376,7 @@ class _CreateTimedTaskState extends State<CreateTimedTask> {
                               shape: StadiumBorder(),
                               backgroundColor: Colors.white,
                               side: BorderSide(
-                                  color: Color(0xff8377D1), width: 1),
+                                  color: Color(0xff2EB18B), width: 1),
                             ),
                             onPressed: () {
                               _createSimpleTask();
@@ -384,7 +384,7 @@ class _CreateTimedTaskState extends State<CreateTimedTask> {
                             child: Text(
                               'Crear Tarea',
                               style: TextStyle(
-                                  color: Color(0xff8377D1),
+                                  color: Color(0xff2EB18B),
                                   fontSize: 15,
                                   fontStyle: FontStyle.italic),
                             ))),

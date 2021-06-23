@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 import 'package:speedplanner/models/Course.dart';
 import 'package:speedplanner/pages/detailCourse.dart';
@@ -26,7 +27,7 @@ class _CoursesState extends State<Courses> {
   GetAllCoursesByUserIdService getCourses = new GetAllCoursesByUserIdService();
   List<Course> listCourse = [];
   String formatter = '';
-  bool loading = false;
+  bool loading = true;
 
   void getCurrentDate() async {
     DateTime now = new DateTime.now();
@@ -36,32 +37,20 @@ class _CoursesState extends State<Courses> {
 
   void getCourse() async {
     await getCourses.getAllCoursesByUserId(widget.id, widget.token);
+    assignData();
+  }
+
+  void assignData() {
+    loading = false;
     setState(() {
       listCourse = getCourses.courses;
     });
-    for (int i = 0; i < listCourse.length; i++) {
-      print(
-          "El curso $i : ${listCourse[i].id} - ${listCourse[i].name} - ${listCourse[i].description} - ${listCourse[i].email}- ${listCourse[i].color}");
-      print("Tamaño de la lista de tiempos: ${listCourse[i].listTimes.length}");
-      print("Lista de fechas del curso:");
-      for (int j = 0; j < listCourse[i].listTimes.length; j++) {
-        print(
-            "Fecha $j: ${listCourse[i].listTimes[j].id} - ${listCourse[i].listTimes[j].day} - ${listCourse[i].listTimes[j].starterTime} - ${listCourse[i].listTimes[j].finishTime}");
-      }
-    }
   }
 
   @override
   void initState() {
     super.initState();
-    /*Timer(const Duration(milliseconds: 6000), () {
-      loading = true;
-      print(loading);
-    });*/
     getCurrentDate();
-    print('El id en Course es : ${widget.id}');
-    print('El token en Course es : ${widget.token}');
-    print('El nombre del usuario es : ${widget.username}');
     getCourse();
   }
 
@@ -69,33 +58,52 @@ class _CoursesState extends State<Courses> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 35),
-        child: FloatingActionButton(
-          heroTag: "btn1",
-          backgroundColor: Color(0x00000000),
-          onPressed: () {
-            Navigator.pushNamed(context, '/addCourse', arguments: {
-              'id': widget.id,
-              'token': widget.token,
-              'username': widget.username
-            });
-          },
-          child: const Icon(
-            Icons.add_circle,
-            color: Color(0xff8377D1),
-            size: 50.0,
-          ),
-        ),
-      ),
-      body:
-          /*loading == true
+      floatingActionButton: loading
+          ? null
+          : Padding(
+              padding: const EdgeInsets.only(bottom: 35),
+              child: FloatingActionButton(
+                heroTag: "btn1",
+                backgroundColor: Color(0x00000000),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/addCourse', arguments: {
+                    'id': widget.id,
+                    'token': widget.token,
+                    'username': widget.username
+                  });
+                },
+                child: const Icon(
+                  Icons.add_circle,
+                  color: Color(0xff8377D1),
+                  size: 50.0,
+                ),
+              ),
+            ),
+      body: loading
           ? Container(
               decoration: BoxDecoration(color: backgroundColor),
-              child: Center(child: Text("GAAAAAAAAAAAAAA")),
-            )
-          :*/
-          listCourse.isEmpty
+              height: size.height,
+              width: double.infinity,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    child: Center(
+                        child: SpinKitFadingCircle(
+                      color: purpleColor,
+                      size: 50,
+                    )),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: Text(
+                      'Cargando cursos',
+                      style: TextStyle(color: purpleColor),
+                    ),
+                  )
+                ],
+              ))
+          : listCourse.isEmpty
               ? notCourses()
               : Container(
                   height: size.height,
@@ -145,16 +153,15 @@ class _CoursesState extends State<Courses> {
 
 Widget cardCourse(Course course, String username, String token, context) {
   int colorCard = int.parse(course.color);
-
   return Container(
     child: Padding(
-      padding: const EdgeInsets.symmetric(vertical: 1.0, horizontal: 4.0),
+      padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 4.0),
       child: Card(
         child: Container(
           decoration: BoxDecoration(color: Color(colorCard)),
           child: Padding(
             //padding: const EdgeInsets.all(36.0),
-            padding: const EdgeInsets.fromLTRB(15.0, 20.0, 15.0, 5),
+            padding: const EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -176,11 +183,11 @@ Widget cardCourse(Course course, String username, String token, context) {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 10.0, top: 5.0),
+                  padding: const EdgeInsets.only(left: 10.0, top: 5, bottom: 5),
                   child: Row(
                     children: <Widget>[
                       Container(
-                        height: 70,
+                        height: 23.3 * course.listTimes.length,
                         width: 160,
                         child: ListView.builder(
                             itemCount: course.listTimes.length,
@@ -195,10 +202,10 @@ Widget cardCourse(Course course, String username, String token, context) {
                             }),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(left: 45, bottom: 30),
+                        padding: const EdgeInsets.only(left: 70, bottom: 10),
                         child: Container(
-                          height: 33,
-                          width: 130,
+                          height: 35,
+                          width: 100,
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.all(Radius.circular(40)),
@@ -218,7 +225,7 @@ Widget cardCourse(Course course, String username, String token, context) {
                                 );
                               },
                               child: Text(
-                                'Ver Detalles',
+                                'Detalles',
                                 style: TextStyle(
                                     color: Color(colorCard),
                                     fontSize: 13,
