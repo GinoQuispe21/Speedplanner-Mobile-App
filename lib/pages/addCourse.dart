@@ -111,47 +111,51 @@ class _AddCourseState extends State<AddCourse> {
       id, token, name, description, email, color) async {
     print(id);
     print(token);
-    var urlCourses = Uri.parse(
-        'https://speedplanner-mobile.herokuapp.com/api/users/$id/courses');
+    if (dayArr.length != 0) {
+      var urlCourses = Uri.parse(
+          'https://speedplanner-mobile.herokuapp.com/api/users/$id/courses');
 
-    http.Response response = await http.post(urlCourses,
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-          'Authorization': token,
-        },
-        body: jsonEncode(<String, String>{
-          'name': name,
-          'description': description,
-          'email': email,
-          'color': color
-        }));
-    if (response.statusCode == 200) {
-      print("Curso creado: $name");
-      for (var i = 0; i < dayArr.length; i++) {
-        Map dataCourse = jsonDecode(utf8.decode(response.bodyBytes));
-        int idCourse = dataCourse['id'];
-        http.Response responseTime = await http.post(
-            Uri.parse(
-                'https://speedplanner-mobile.herokuapp.com/api/courses/$idCourse/times'),
-            headers: <String, String>{
-              'Content-Type': 'application/json',
-              'Authorization':
-                  'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnaW5vIn0.bCcj99sO-yCeKqTfxBEUMinv8ei5EEsSDZy-mG1tjHaE6Z4Pn9YB7bJCrUOaqp-1pV1vXIBiPcNTY7KFWh12Zw'
-            },
-            body: jsonEncode(<String, String>{
-              'day': dayArr[i],
-              'startTime': startArr[i],
-              'finishTime': finishArr[i],
-            }));
-        if (response.statusCode == 200) {
-          print("Tiempo agregado");
-          Navigator.pop(context, '/addCourse');
+      http.Response response = await http.post(urlCourses,
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+            'Authorization': token,
+          },
+          body: jsonEncode(<String, String>{
+            'name': name,
+            'description': description,
+            'email': email,
+            'color': color
+          }));
+      if (response.statusCode == 200) {
+        print("Curso creado: $name");
+        for (var i = 0; i < dayArr.length; i++) {
+          Map dataCourse = jsonDecode(utf8.decode(response.bodyBytes));
+          int idCourse = dataCourse['id'];
+          http.Response responseTime = await http.post(
+              Uri.parse(
+                  'https://speedplanner-mobile.herokuapp.com/api/courses/$idCourse/times'),
+              headers: <String, String>{
+                'Content-Type': 'application/json',
+                'Authorization':
+                    'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnaW5vIn0.bCcj99sO-yCeKqTfxBEUMinv8ei5EEsSDZy-mG1tjHaE6Z4Pn9YB7bJCrUOaqp-1pV1vXIBiPcNTY7KFWh12Zw'
+              },
+              body: jsonEncode(<String, String>{
+                'day': dayArr[i],
+                'startTime': startArr[i],
+                'finishTime': finishArr[i],
+              }));
+          if (response.statusCode == 200) {
+            print("Tiempo agregado");
+            Navigator.pop(context, '/addCourse');
+          }
         }
+      } else {
+        print("Error en la creación");
       }
+      return response;
     } else {
-      print("Error en la creación");
+      print("Error");
     }
-    return response;
   }
 
   @override

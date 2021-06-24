@@ -1,7 +1,19 @@
-class STask {
+class SimpleTask {
   int id;
-  String title;
   bool finished;
   String deadline;
-  STask(this.id, this.title, this.finished, this.deadline);
+  String title;
+  String description;
+  SimpleTask(
+      this.id, this.finished, this.deadline, this.title, this.description);
+}
+
+class TestSimpleTask {
+  int id;
+  bool finished;
+  String deadline;
+  String title;
+  String description;
+  TestSimpleTask(
+      {this.id, this.finished, this.deadline, this.title, this.description});
 }

@@ -106,7 +106,9 @@ class _CoursesState extends State<Courses> {
                             child: ListView.builder(
                               itemCount: listCourse.length,
                               itemBuilder: (context, index) {
-                                return cardCourse(listCourse[index]);
+                                return cardCourse(
+                                  listCourse[index],
+                                );
                               },
                             ),
                           ),

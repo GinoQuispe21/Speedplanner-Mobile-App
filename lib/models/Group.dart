@@ -1,9 +1,6 @@
-import 'STask.dart';
-
-class Group {
+class StudyGroup {
   int id;
   String name;
-  String description;
-  List<STask> listSimpleTasks = [];
-  Group(this.id, this.name, this.description, this.listSimpleTasks);
+  String descrpiton;
+  StudyGroup(this.id, this.name, this.descrpiton);
 }

@@ -1,43 +1,99 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:http/http.dart';
+import 'package:speedplanner/models/Group.dart';
+import 'package:speedplanner/models/LisTasks.dart';
 
-import 'package:http/http.dart' as http;
-import 'package:speedplanner/models/CourseGroup.dart';
-import 'package:speedplanner/models/GroupList.dart';
+import 'package:speedplanner/models/STask.dart';
+import 'package:speedplanner/models/TTask.dart';
 
-class GetAllCoursesAndGroupsByUserIdService {
-  List<CourseGroup> courses = [];
-  List<GroupList> groupsL = [];
-  Future<void> getAllCoursesAndGroupByUserId(id, token) async {
+class GroupsService {
+  List<StudyGroup> studyGroupList = [];
+  List<SimpleTask> simpleTaskList = [];
+  List<TimedTask> timedTaskList = [];
+  List<ListTask> listAllTasks = [];
+  Future<void> getAllGroupsByCourseId(id, token) async {
     try {
-      http.Response response = await http.get(
+      Response response = await get(
           Uri.parse(
-              'https://speedplanner-mobile.herokuapp.com/api/users/$id/courses'),
+              'https://speedplanner-mobile.herokuapp.com/api/courses/$id/studyGroups'),
           headers: {HttpHeaders.authorizationHeader: token});
       if (response.statusCode == 200) {
-        Map coursesResponse = jsonDecode(utf8.decode(response.bodyBytes));
-        for (int i = 0; i < coursesResponse['content'].length; i++) {
-          String controlId = coursesResponse['content'][i]['id'].toString();
-          http.Response responseGroups = await http.get(
+        Map dataGroups = jsonDecode(utf8.decode(response.bodyBytes));
+        for (int i = 0; i < dataGroups['content'].length; i++) {
+          //Add all the simple task for the course id in the simple task array
+          String groupId = dataGroups['content'][i]['id'].toString();
+          Response responseSimpleTask = await get(
               Uri.parse(
-                  'https://speedplanner-mobile.herokuapp.com/api/courses/$controlId/studyGroups'),
+                  'https://speedplanner-mobile.herokuapp.com/api/studyGroups/$groupId/simpleTasks'),
               headers: {HttpHeaders.authorizationHeader: token});
-          Map groupsResponse =
-              jsonDecode(utf8.decode(responseGroups.bodyBytes));
-          for (int j = 0; j < groupsResponse['content'].length; j++) {
-            groupsL.add(new GroupList(
-                groupsResponse['content'][j]['id'],
-                groupsResponse['content'][j]['name'],
-                groupsResponse['content'][j]['description']));
+          if (responseSimpleTask.statusCode == 200) {
+            Map dataSimpleTask =
+                jsonDecode(utf8.decode(responseSimpleTask.bodyBytes));
+            for (int j = 0; j < dataSimpleTask['content'].length; j++) {
+              simpleTaskList.add(new SimpleTask(
+                dataSimpleTask['content'][j]['id'],
+                dataSimpleTask['content'][j]['finished'],
+                dataSimpleTask['content'][j]['deadline'],
+                dataSimpleTask['content'][j]['title'],
+                dataSimpleTask['content'][j]['description'],
+              ));
+              listAllTasks.add(new ListTask(
+                dataSimpleTask['content'][j]['id'],
+                '(TS)',
+                dataSimpleTask['content'][j]['title'],
+                dataSimpleTask['content'][j]['finished'],
+              ));
+            }
           }
-          courses.add(new CourseGroup(
-              coursesResponse['content'][i]['id'],
-              coursesResponse['content'][i]['name'],
-              coursesResponse['content'][i]['description'],
-              coursesResponse['content'][i]['email'],
-              coursesResponse['content'][i]['color'],
-              groupsL));
-          groupsL = [];
+
+          Response responseTimedTask = await get(
+              Uri.parse(
+                  'https://speedplanner-mobile.herokuapp.com/api/studyGroups/$groupId/timedTasks'),
+              headers: {HttpHeaders.authorizationHeader: token});
+
+          if (responseTimedTask.statusCode == 200) {
+            Map dataTimedTask =
+                jsonDecode(utf8.decode(responseTimedTask.bodyBytes));
+            for (int k = 0; k < dataTimedTask['content'].length; k++) {
+              timedTaskList.add(new TimedTask(
+                dataTimedTask['content'][k]['id'],
+                dataTimedTask['content'][k]['finished'],
+                dataTimedTask['content'][k]['startTime'],
+                dataTimedTask['content'][k]['finishTime'],
+                dataTimedTask['content'][k]['title'],
+                dataTimedTask['content'][k]['description'],
+              ));
+              listAllTasks.add(new ListTask(
+                dataTimedTask['content'][k]['id'],
+                '(TC)',
+                dataTimedTask['content'][k]['title'],
+                dataTimedTask['content'][k]['finished'],
+              ));
+            }
+          }
+
+          studyGroupList.add(new StudyGroup(
+            dataGroups['content'][i]['id'],
+            dataGroups['content'][i]['name'],
+            dataGroups['content'][i]['description'],
+          ));
+        }
+        print("Lista de Tareas Simple:");
+        for (int i = 0; i < simpleTaskList.length; i++) {
+          print('${simpleTaskList[i].id} - ${simpleTaskList[i].title}');
+        }
+        print("Lista de Tareas Cronometradas:");
+        for (int i = 0; i < timedTaskList.length; i++) {
+          print('${timedTaskList[i].id} - ${timedTaskList[i].title}');
+        }
+        int sizeListTasks = simpleTaskList.length + timedTaskList.length;
+        print("--------------------------------");
+        print("El arreglo del total de tareas: ");
+        print('Tamaño del arreglo: $sizeListTasks');
+        for (int i = 0; i < sizeListTasks; i++) {
+          print(
+              ' - ${listAllTasks[i].type} - ${listAllTasks[i].id} - ${listAllTasks[i].title}');
         }
       }
     } catch (e) {

@@ -1,35 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:speedplanner/Services/GetTasksByGroupId.dart';
+import 'package:speedplanner/Services/GetAllCourses.dart';
 
 import 'package:speedplanner/Services/getAllGroupsByCourseId.dart';
-import 'package:speedplanner/models/CourseGroup.dart';
+import 'package:speedplanner/models/Course.dart';
 import 'package:speedplanner/models/Group.dart';
-import 'package:speedplanner/models/GroupList.dart';
-import 'package:speedplanner/utils/dateFooter.dart';
+import 'package:speedplanner/models/LisTasks.dart';
+import 'package:speedplanner/models/STask.dart';
+import 'package:speedplanner/models/TTask.dart';
+import 'package:speedplanner/pages/taskDetails.dart';
 import 'package:speedplanner/utils/dateFooter.dart';
 
 class Tasks extends StatefulWidget {
   final int id;
   final String token;
+  final String username;
 
-  const Tasks({this.id, this.token, Key key}) : super(key: key);
+  const Tasks({this.id, this.token, this.username, Key key}) : super(key: key);
 
   @override
   _TasksState createState() => _TasksState();
 }
 
 class _TasksState extends State<Tasks> {
-  GetAllCoursesAndGroupsByUserIdService getGroups =
-      new GetAllCoursesAndGroupsByUserIdService();
-  GetAllTasksByGroupIdService getTasks = new GetAllTasksByGroupIdService();
-  List<CourseGroup> listCoursesGroups = [];
-  List<Group> listTasks = [];
+  GetAllCoursesByUserIdService getCourses = new GetAllCoursesByUserIdService();
+  List<Course> listCourse = [];
+  List<StudyGroup> listGroup = [];
+  List<SimpleTask> listSimpleTask = [];
+  List<TimedTask> listTimedTask = [];
+  List<ListTask> listAllTasks = [];
+  GroupsService groupsService = new GroupsService();
   String formatter = '';
 
+  var countTasks = [];
   var courseCount = [];
-  var numTaskPerCourse = [];
   var cont = 0;
+  var aux = 0;
 
   void getCurrentDate() async {
     DateTime now = new DateTime.now();
@@ -37,42 +43,41 @@ class _TasksState extends State<Tasks> {
     print(formatter);
   }
 
-  void getCourseAndGroups() async {
-    await getGroups.getAllCoursesAndGroupByUserId(widget.id, widget.token);
+  void getCourse() async {
+    await getCourses.getAllCoursesByUserId(widget.id, widget.token);
     setState(() {
-      listCoursesGroups = getGroups.courses;
+      listCourse = getCourses.courses;
     });
-    for (int i = 0; i < listCoursesGroups.length; i++) {
-      courseCount.add(listCoursesGroups[i].name);
+    for (int i = 0; i < listCourse.length; i++) {
+      courseCount.add(listCourse[i].id);
       print(
-          "El curso $i : ${listCoursesGroups[i].id} - ${listCoursesGroups[i].name} - ${listCoursesGroups[i].description} - ${listCoursesGroups[i].email}- ${listCoursesGroups[i].color}");
-      for (int j = 0; j < listCoursesGroups[i].listGroups.length; j++) {
-        print(
-            "El curso ${listCoursesGroups[i].name} posee el grupo ${listCoursesGroups[i].listGroups[j].id} ${listCoursesGroups[i].listGroups[j].name}");
-        cont++;
-      }
-    }
-
-    for (int i = 0; i < listCoursesGroups.length; i++) {
-      cont = 0;
-      for (int j = 0; j < listCoursesGroups[i].listGroups.length; j++) {
-        await getTasks.getAllTasksByGroupId(
-            listCoursesGroups[i].listGroups[j].id, widget.token);
-        setState(() {
-          listTasks = getTasks.groups;
-        });
-        for (int k = 0; k < listTasks.length; k++) {
-          print(
-              "El curso ${listCoursesGroups[i].name} posee ${listTasks[k].id} ${listTasks[k].name} ---> posee ${listTasks[k].listSimpleTasks.length}");
-          for (int j = 0; j < listTasks[j].listSimpleTasks.length; j++) {
-            cont++;
-          }
-        }
-      }
-      numTaskPerCourse.add(cont);
+          "El curso $i : ${listCourse[i].id} - ${listCourse[i].name} - ${listCourse[i].description} - ${listCourse[i].email}- ${listCourse[i].color}");
+      print("Tamaño de la lista de tiempos: ${listCourse[i].listTimes.length}");
+      print("Lista de fechas del curso:");
     }
     print(courseCount);
-    print(numTaskPerCourse);
+
+    for (int i = 0; i < courseCount.length; i++) {
+      cont = 0;
+      aux = listAllTasks.length;
+      await groupsService.getAllGroupsByCourseId(courseCount[i], widget.token);
+      setState(() {
+        listGroup = groupsService.studyGroupList;
+        listSimpleTask = groupsService.simpleTaskList;
+        listTimedTask = groupsService.timedTaskList;
+        listAllTasks = groupsService.listAllTasks;
+      });
+      print("Lista de grupos");
+      for (int i = 0; i < listGroup.length; i++) {
+        print(
+            '${listGroup[i].id} - ${listGroup[i].name} - ${listGroup[i].descrpiton}');
+      }
+      for (int j = 0; j < listAllTasks.length; j++) {
+        cont++;
+      }
+      countTasks.add(cont - aux);
+    }
+    print(countTasks);
   }
 
   void getGroupAndTasks() async {}
@@ -84,14 +89,15 @@ class _TasksState extends State<Tasks> {
     // print('El id en Course es : ${widget.id}');
     // print('El token en Course es : ${widget.token}');
     // print('El nombre del usuario es : ${widget.username}');
-    getCourseAndGroups();
+    //getCourseAndGroups();
+    getCourse();
   }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      body: listCoursesGroups.isEmpty
+      body: listCourse.isEmpty
           ? notTask()
           : Container(
               height: size.height,
@@ -114,17 +120,20 @@ class _TasksState extends State<Tasks> {
                           Container(
                               height: size.height / 1.57,
                               width: double.infinity,
-                              child:
-                                  numTaskPerCourse.length == courseCount.length
-                                      ? ListView.builder(
-                                          itemCount: listCoursesGroups.length,
-                                          itemBuilder: (context, index) {
-                                            return taskCourse(
-                                                listCoursesGroups[index],
-                                                numTaskPerCourse[index]);
-                                          },
-                                        )
-                                      : Text("esperando data")),
+                              child: listCourse.length == countTasks.length
+                                  ? ListView.builder(
+                                      itemCount: listCourse.length,
+                                      itemBuilder: (context, index) {
+                                        return taskCourse(
+                                            listCourse[index],
+                                            countTasks[index],
+                                            context,
+                                            widget.token,
+                                            widget.id,
+                                            widget.username);
+                                      },
+                                    )
+                                  : Text("esperando data")),
                         ],
                       ),
                     ),
@@ -147,9 +156,9 @@ class _TasksState extends State<Tasks> {
 //   )
 // }
 
-Widget taskCourse(CourseGroup course, int array) {
+Widget taskCourse(
+    Course course, int task, context, String token, int id, String uName) {
   int colorCard = int.parse(course.color);
-  for (int i = 0; i < course.listGroups.length; i++) {}
   return Container(
     child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 1.0, horizontal: 4.0),
@@ -173,7 +182,7 @@ Widget taskCourse(CourseGroup course, int array) {
                         fontStyle: FontStyle.italic),
                   ),
                   Text(
-                    'Total de Tareas por realizar: ${array}',
+                    'Total de Tareas por realizar: ${task}',
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -196,7 +205,25 @@ Widget taskCourse(CourseGroup course, int array) {
                           padding: const EdgeInsets.only(bottom: 1),
                           child: TextButton(
                             style: TextButton.styleFrom(),
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => TaskDetails(
+                                          id: id,
+                                          courseId: course.id,
+                                          token: token,
+                                          username: uName,
+                                        )),
+                              );
+                              // Navigator.pushNamed(context, '/taskDetails',
+                              //     arguments: {
+                              //       'id': id,
+                              //       'token': token,
+                              //       'username': uName,
+                              //       'courseId': course.id,
+                              //     });
+                            },
                             child: Text(
                               'Ver Tareas',
                               style: TextStyle(
