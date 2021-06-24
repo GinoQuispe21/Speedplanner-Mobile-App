@@ -5,6 +5,6 @@ class Group {
   String name;
   String description;
   String courseName;
-  //List<Member> members;
-  Group(this.id, this.name, this.description, this.courseName);
+  List<Member> members;
+  Group(this.id, this.name, this.description, this.courseName, this.members);
 }
