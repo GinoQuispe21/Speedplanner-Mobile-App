@@ -6,6 +6,8 @@ import 'package:speedplanner/models/Group.dart';
 import 'package:speedplanner/Services/GroupService.dart';
 import 'package:speedplanner/Services/GetAllCourses.dart';
 import 'package:speedplanner/Services/ProfileService.dart';
+import 'package:speedplanner/models/Member.dart';
+import 'package:speedplanner/models/Course.dart';
 
 class Groups extends StatefulWidget {
   final int id;
@@ -18,9 +20,11 @@ class Groups extends StatefulWidget {
 }
 
 class _GroupsState extends State<Groups> {
+  bool loading = true;
   String formatter = '';
   List<Group> groupList = [];
-  List<String> courseNames = [];
+  List<Course> courses = [];
+  List<Member> memberList = [];
   GetAllCoursesByUserIdService coursesService =
       new GetAllCoursesByUserIdService();
   GroupService groupService = new GroupService();
@@ -37,31 +41,33 @@ class _GroupsState extends State<Groups> {
   void initState() {
     super.initState();
     getDate();
-    getCourseNames();
-    getGroups();
+    getCourses();
     getName();
   }
 
-  void getCourseNames() async {
+  void getCourses() async {
     await coursesService.getAllCoursesByUserId(widget.id, widget.token);
-    setState(() {
-      for (int i = 0; i < coursesService.courses.length; i++) {
-        courseNames.add(coursesService.courses[i].name);
-        print("added " + courseNames[i]);
-      }
-    });
+    for (int i = 0; i < coursesService.courses.length; i++) {
+      courses.add(coursesService.courses[i]);
+      print("added " + courses[i].name);
+    }
+    await getGroups();
   }
 
   void getGroups() async {
-    await groupService.getAllGroups(widget.id, widget.token, 1);
+    for (int i = 0; i < courses.length; i++) {
+      await groupService.getAllGroups(widget.id, widget.token, courses[i].id);
+    }
+    setGroups();
+  }
+
+  void setGroups() {
     setState(() {
       groupList = groupService.groups;
-      for (int i = 0; i < groupList.length; i++) {
-        //groupList[i].courseName = courseNames[0];
-      }
       print("gl size:" + groupList.length.toString());
-      print("group size: " + groupService.groups.length.toString());
+      print("groups size: " + groupService.groups.length.toString());
     });
+    loading = false;
   }
 
   void getName() async {
@@ -75,52 +81,55 @@ class _GroupsState extends State<Groups> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 35),
-        child: FloatingActionButton(
-          heroTag: "addGroupBtn",
-          backgroundColor: Color(0x00000000),
-          elevation: 0,
-          onPressed: () {},
-          child: const Icon(
-            //
-            Icons.add_circle,
-            color: Color(0xff8377D1),
-            size: 50,
+        floatingActionButton: Padding(
+          padding: const EdgeInsets.only(bottom: 35),
+          child: FloatingActionButton(
+            heroTag: "addGroupBtn",
+            backgroundColor: Color(0x00000000),
+            elevation: 0,
+            onPressed: () {},
+            child: const Icon(
+              //
+              Icons.add_circle,
+              color: Color(0xff8377D1),
+              size: 50,
+            ),
           ),
         ),
-      ),
-      body: Container(
-          height: size.height,
-          width: double.infinity,
-          decoration: BoxDecoration(color: Color(0xffE9EBF8)),
-          child: Container(
-            child: Stack(
-              children: <Widget>[
-                Positioned(
-                    child: Column(
-                  children: <Widget>[
-                    Container(
-                      height: size.height / 1.57,
-                      width: double.infinity,
-                      child: ListView.builder(
-                          itemCount: groupList.length,
-                          itemBuilder: (context, index) {
-                            return groupCard(
-                                groupList[index], name, courseNames[index]);
-                          }),
-                    )
-                  ],
-                )),
-                Positioned(
-                  bottom: 0,
-                  child: dateFooter(
-                      context: context, currentDate: 'Date: ' + formatter),
-                )
-              ],
-            ),
-          )),
-    );
+        body: loading
+            ? loadingGroups()
+            : groupList.isEmpty
+                ? noGroups()
+                : Container(
+                    height: size.height,
+                    width: double.infinity,
+                    decoration: BoxDecoration(color: Color(0xffE9EBF8)),
+                    child: Container(
+                      child: Stack(
+                        children: <Widget>[
+                          Positioned(
+                              child: Column(
+                            children: <Widget>[
+                              Container(
+                                height: size.height / 1.57,
+                                width: double.infinity,
+                                child: ListView.builder(
+                                    itemCount: groupList.length,
+                                    itemBuilder: (context, index) {
+                                      return groupCard(groupList[index], name);
+                                    }),
+                              )
+                            ],
+                          )),
+                          Positioned(
+                            bottom: 0,
+                            child: dateFooter(
+                                context: context,
+                                currentDate: 'Date: ' + formatter),
+                          )
+                        ],
+                      ),
+                    )));
   }
 }
 
@@ -140,7 +149,39 @@ TextStyle groupName() {
       color: Colors.white);
 }
 
-Widget groupCard(Group group, String name, String courseName) {
+Widget loadingGroups() {
+  return Container(
+    decoration: BoxDecoration(color: Color(0xffE9EBF8)),
+    child: Center(
+      child: Text(
+        'Cargando grupos. Por favor espere...',
+        style: TextStyle(
+            color: purpleColor,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            fontStyle: FontStyle.italic),
+      ),
+    ),
+  );
+}
+
+Widget noGroups() {
+  return Container(
+    decoration: BoxDecoration(color: Color(0xffE9EBF8)),
+    child: Center(
+      child: Text(
+        'Todavía no se han agregado Grupos. Cree un Curso para añadir sus Grupos',
+        style: TextStyle(
+            color: purpleColor,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            fontStyle: FontStyle.italic),
+      ),
+    ),
+  );
+}
+
+Widget groupCard(Group group, String name) {
   return Container(
     child: Column(
       children: <Widget>[
@@ -180,13 +221,35 @@ Widget groupCard(Group group, String name, String courseName) {
                 Row(children: [Text('Miembros', style: detailTitles())]),
                 Row(
                   children: [
-                    Text(name, style: TextStyle(fontStyle: FontStyle.italic))
+                    Container(
+                        height: 75,
+                        width: 85,
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('-' + name,
+                            style: TextStyle(
+                                fontStyle: FontStyle.italic,
+                                decoration: TextDecoration.underline))),
+                    Container(
+                        height: 70,
+                        width: 150,
+                        padding: EdgeInsets.symmetric(horizontal: 16.0),
+                        child: ListView.builder(
+                            itemCount: group.members.length,
+                            itemBuilder:
+                                (BuildContext context, int memberIndex) {
+                              return Container(
+                                child: Text(
+                                  '${group.members[memberIndex].name}',
+                                  textAlign: TextAlign.center,
+                                ),
+                              );
+                            }))
                   ],
                 ),
                 Row(
                   children: [
                     Text(
-                      'Creador del grupo',
+                      'Creador del\n grupo',
                       style: TextStyle(fontStyle: FontStyle.italic),
                     )
                   ],
@@ -207,7 +270,7 @@ Widget groupCard(Group group, String name, String courseName) {
                 Row(
                   children: [
                     Text(
-                      courseName,
+                      '${group.courseName}',
                       style: TextStyle(fontStyle: FontStyle.italic),
                     )
                   ],
