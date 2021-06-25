@@ -50,7 +50,7 @@ class _HomeState extends State<Home> {
         token: token,
         username: name,
       ),
-      Groups(),
+      Groups(id: id, token: token),
       Profile(id: id, token: token)
     ];
 
