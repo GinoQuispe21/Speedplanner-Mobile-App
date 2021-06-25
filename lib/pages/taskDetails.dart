@@ -12,7 +12,7 @@ import 'package:speedplanner/models/HardModels/STask.dart';
 import 'package:speedplanner/models/HardModels/TTask.dart';
 import 'package:speedplanner/utils/AppBar.dart';
 import 'package:speedplanner/utils/colors.dart';
-import 'package:speedplanner/Services/getAllGroupsByCourseId.dart';
+import 'package:speedplanner/Services/getAllTasksByUserId.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:speedplanner/utils/dateFooter.dart';
 
@@ -57,7 +57,7 @@ class _TaskDetailsState extends State<TaskDetails> {
   }
 
   void getTasks() async {
-    await groupsService.getAllGroupsByCourseId(widget.courseId, widget.token);
+    await groupsService.getAllTasksByCourseId(widget.courseId, widget.token);
     setState(() {
       listGroup = groupsService.studyGroupList;
       listSimpleTask = groupsService.simpleTaskList;
