@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:speedplanner/Services/UserService.dart';
 import 'package:speedplanner/utils/colors.dart';
 import 'package:speedplanner/utils/dateFooter.dart';
 import 'package:speedplanner/models/Group.dart';
@@ -8,12 +9,13 @@ import 'package:speedplanner/Services/GetAllCourses.dart';
 import 'package:speedplanner/Services/ProfileService.dart';
 import 'package:speedplanner/models/Member.dart';
 import 'package:speedplanner/models/Course.dart';
+import 'package:speedplanner/pages/addGroup.dart';
 
 class Groups extends StatefulWidget {
   final int id;
   final String token;
 
-  const Groups({this.id, this.token, Key key}) : super(key: key);
+  Groups({this.id, this.token, Key key}) : super(key: key);
 
   @override
   _GroupsState createState() => _GroupsState();
@@ -29,7 +31,11 @@ class _GroupsState extends State<Groups> {
       new GetAllCoursesByUserIdService();
   GroupService groupService = new GroupService();
   ProfileService profileService = new ProfileService();
+  UserService userService = new UserService();
   String name = '';
+  String username = '';
+  ScrollController scrollController = new ScrollController();
+  ScrollController mainScroll = new ScrollController();
 
   void getDate() {
     DateTime now = new DateTime.now();
@@ -72,8 +78,12 @@ class _GroupsState extends State<Groups> {
 
   void getName() async {
     await profileService.getProfileData(widget.id, widget.token);
+    await userService.getUserData(widget.id, widget.token);
     setState(() {
       name = profileService.name;
+      username = userService.user;
+      print('name: ' + name);
+      print('username: ' + username);
     });
   }
 
@@ -100,36 +110,44 @@ class _GroupsState extends State<Groups> {
             ? loadingGroups()
             : groupList.isEmpty
                 ? noGroups()
-                : Container(
-                    height: size.height,
-                    width: double.infinity,
-                    decoration: BoxDecoration(color: Color(0xffE9EBF8)),
+                : RawScrollbar(
+                    isAlwaysShown: true,
+                    controller: mainScroll,
+                    thumbColor: scrollColor,
+                    radius: Radius.circular(8),
                     child: Container(
-                      child: Stack(
-                        children: <Widget>[
-                          Positioned(
-                              child: Column(
+                        height: size.height,
+                        width: double.infinity,
+                        decoration: BoxDecoration(color: Color(0xffE9EBF8)),
+                        child: Container(
+                          child: Stack(
                             children: <Widget>[
-                              Container(
-                                height: size.height / 1.57,
-                                width: double.infinity,
-                                child: ListView.builder(
-                                    itemCount: groupList.length,
-                                    itemBuilder: (context, index) {
-                                      return groupCard(groupList[index], name);
-                                    }),
+                              Positioned(
+                                  child: Column(
+                                children: <Widget>[
+                                  Container(
+                                    height: size.height / 1.57,
+                                    width: double.infinity,
+                                    child: ListView.builder(
+                                        controller: scrollController,
+                                        itemCount: groupList.length,
+                                        itemBuilder: (context, index) {
+                                          return groupCard(groupList[index],
+                                              name, scrollController, context);
+                                        }),
+                                  )
+                                ],
+                              )),
+                              Positioned(
+                                bottom: 0,
+                                child: dateFooter(
+                                    context: context,
+                                    currentDate: 'Date: ' + formatter),
                               )
                             ],
-                          )),
-                          Positioned(
-                            bottom: 0,
-                            child: dateFooter(
-                                context: context,
-                                currentDate: 'Date: ' + formatter),
-                          )
-                        ],
-                      ),
-                    )));
+                          ),
+                        )),
+                  ));
   }
 }
 
@@ -181,7 +199,8 @@ Widget noGroups() {
   );
 }
 
-Widget groupCard(Group group, String name) {
+Widget groupCard(Group group, String name, ScrollController scrollController,
+    BuildContext context) {
   return Container(
     child: Column(
       children: <Widget>[
@@ -222,35 +241,40 @@ Widget groupCard(Group group, String name) {
                 Row(
                   children: [
                     Container(
-                        height: 75,
-                        width: 85,
-                        padding: EdgeInsets.all(8.0),
-                        child: Text('-' + name,
-                            style: TextStyle(
-                                fontStyle: FontStyle.italic,
-                                decoration: TextDecoration.underline))),
-                    Container(
-                        height: 70,
-                        width: 150,
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        child: ListView.builder(
-                            itemCount: group.members.length,
-                            itemBuilder:
-                                (BuildContext context, int memberIndex) {
-                              return Container(
-                                child: Text(
-                                  '${group.members[memberIndex].name}',
-                                  textAlign: TextAlign.center,
-                                ),
-                              );
-                            }))
-                  ],
-                ),
-                Row(
-                  children: [
-                    Text(
-                      'Creador del\n grupo',
-                      style: TextStyle(fontStyle: FontStyle.italic),
+                      width: MediaQuery.of(context).size.width * 0.85,
+                      padding: EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Column(
+                        children: <Widget>[
+                          Container(
+                              width: MediaQuery.of(context).size.width * 0.75,
+                              child: Text('-' + name + '\nCreador del grupo',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.w600))),
+                          group.members.length > 0
+                              ? Container(
+                                  height: 75,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.75,
+                                  child: RawScrollbar(
+                                    controller: scrollController,
+                                    isAlwaysShown: true,
+                                    thumbColor: purpleColor,
+                                    radius: Radius.circular(8),
+                                    child: ListView.builder(
+                                        itemCount: group.members.length,
+                                        itemBuilder: (BuildContext context,
+                                            int memberIndex) {
+                                          return Text(
+                                            '-${group.members[memberIndex].name}\n' +
+                                                '${group.members[memberIndex].description}',
+                                            textAlign: TextAlign.justify,
+                                          );
+                                        }),
+                                  ),
+                                )
+                              : SizedBox()
+                        ],
+                      ),
                     )
                   ],
                 ),
