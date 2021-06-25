@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 import 'package:speedplanner/Services/GetAllCourses.dart';
 
 import 'package:speedplanner/Services/getAllGroupsByCourseId.dart';
 import 'package:speedplanner/models/Course.dart';
-import 'package:speedplanner/models/Group.dart';
-import 'package:speedplanner/models/LisTasks.dart';
-import 'package:speedplanner/models/STask.dart';
-import 'package:speedplanner/models/TTask.dart';
+import 'package:speedplanner/models/HardModels/Group.dart';
+import 'package:speedplanner/models/HardModels/LisTasks.dart';
+import 'package:speedplanner/models/HardModels/STask.dart';
+import 'package:speedplanner/models/HardModels/TTask.dart';
 import 'package:speedplanner/pages/taskDetails.dart';
+import 'package:speedplanner/utils/colors.dart';
 import 'package:speedplanner/utils/dateFooter.dart';
 
 class Tasks extends StatefulWidget {
@@ -36,6 +38,7 @@ class _TasksState extends State<Tasks> {
   var courseCount = [];
   var cont = 0;
   var aux = 0;
+  var validate = 0;
 
   void getCurrentDate() async {
     DateTime now = new DateTime.now();
@@ -130,10 +133,36 @@ class _TasksState extends State<Tasks> {
                                             context,
                                             widget.token,
                                             widget.id,
-                                            widget.username);
+                                            widget.username,
+                                            countTasks[index]);
                                       },
                                     )
-                                  : Text("esperando data")),
+                                  : Container(
+                                      decoration:
+                                          BoxDecoration(color: backgroundColor),
+                                      // height: size.height,
+                                      width: double.infinity,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Container(
+                                            child: Center(
+                                                child: SpinKitFadingCircle(
+                                              color: purpleColor,
+                                              size: 50,
+                                            )),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(5.0),
+                                            child: Text(
+                                              'Cargando data',
+                                              style:
+                                                  TextStyle(color: purpleColor),
+                                            ),
+                                          )
+                                        ],
+                                      ))),
                         ],
                       ),
                     ),
@@ -156,8 +185,8 @@ class _TasksState extends State<Tasks> {
 //   )
 // }
 
-Widget taskCourse(
-    Course course, int task, context, String token, int id, String uName) {
+Widget taskCourse(Course course, int task, context, String token, int id,
+    String uName, int validation) {
   int colorCard = int.parse(course.color);
   return Container(
     child: Padding(
@@ -214,6 +243,9 @@ Widget taskCourse(
                                           courseId: course.id,
                                           token: token,
                                           username: uName,
+                                          courseName: course.name,
+                                          courseColor: Color(colorCard),
+                                          conditional: validation,
                                         )),
                               );
                               // Navigator.pushNamed(context, '/taskDetails',

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:intl/intl.dart';
 import 'package:speedplanner/utils/AppBar.dart';
 //!import 'package:speedplanner/utils/AppBar.dart';
 import 'package:speedplanner/utils/colors.dart';
@@ -35,7 +36,15 @@ class _AddCourseState extends State<AddCourse> {
   var startArr = [];
   var finishArr = [];
 
+  String formatter = '';
+
   Map data = {};
+
+  void getCurrentDate() async {
+    DateTime now = new DateTime.now();
+    formatter = DateFormat('yMMMd').format(now);
+    print(formatter);
+  }
 
   void timeString(TextEditingController day, TextEditingController start,
       TextEditingController finish) {
@@ -111,7 +120,10 @@ class _AddCourseState extends State<AddCourse> {
       id, token, name, description, email, color) async {
     print(id);
     print(token);
-    if (dayArr.length != 0) {
+    if (dayArr.length != 0 ||
+        nameText.text.isNotEmpty ||
+        descText.text.isNotEmpty ||
+        emailText.text.isNotEmpty) {
       var urlCourses = Uri.parse(
           'https://speedplanner-mobile.herokuapp.com/api/users/$id/courses');
 
@@ -161,6 +173,7 @@ class _AddCourseState extends State<AddCourse> {
   @override
   void initState() {
     super.initState();
+    getCurrentDate();
     timeMessage = timeShow(timeMessage);
     changeColor(firstChoice);
   }
@@ -437,7 +450,7 @@ class _AddCourseState extends State<AddCourse> {
                             decoration: BoxDecoration(color: Color(0xffD7DAEB)),
                             padding: EdgeInsets.symmetric(vertical: 15),
                             child: Text(
-                              'Date: 21 de Abril del 2021',
+                              'Date: ' + formatter,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                   color: Color(0xff8377D1),
