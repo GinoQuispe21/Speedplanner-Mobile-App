@@ -34,8 +34,9 @@ class _GroupsState extends State<Groups> {
   UserService userService = new UserService();
   String name = '';
   String username = '';
-  ScrollController scrollController = new ScrollController();
-  ScrollController mainScroll = new ScrollController();
+  ScrollController scrollController =
+      new ScrollController(initialScrollOffset: 0);
+  ScrollController mainScroll = new ScrollController(initialScrollOffset: 0);
 
   void getDate() {
     DateTime now = new DateTime.now();
@@ -91,13 +92,22 @@ class _GroupsState extends State<Groups> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
+        //TODO: Eliminar FAB al terminar con AddGroup
         floatingActionButton: Padding(
           padding: const EdgeInsets.only(bottom: 35),
           child: FloatingActionButton(
             heroTag: "addGroupBtn",
             backgroundColor: Color(0x00000000),
             elevation: 0,
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => AddGroup(
+                          id: widget.id,
+                          token: widget.token,
+                          username: username)));
+            },
             child: const Icon(
               //
               Icons.add_circle,
