@@ -3,7 +3,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 import 'package:speedplanner/Services/GetAllCourses.dart';
 
-import 'package:speedplanner/Services/getAllGroupsByCourseId.dart';
+import 'package:speedplanner/Services/getAllTasksByUserId.dart';
 import 'package:speedplanner/models/Course.dart';
 import 'package:speedplanner/models/HardModels/Group.dart';
 import 'package:speedplanner/models/HardModels/LisTasks.dart';
@@ -63,7 +63,7 @@ class _TasksState extends State<Tasks> {
     for (int i = 0; i < courseCount.length; i++) {
       cont = 0;
       aux = listAllTasks.length;
-      await groupsService.getAllGroupsByCourseId(courseCount[i], widget.token);
+      await groupsService.getAllTasksByCourseId(courseCount[i], widget.token);
       setState(() {
         listGroup = groupsService.studyGroupList;
         listSimpleTask = groupsService.simpleTaskList;
