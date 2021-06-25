@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:intl/intl.dart';
 import 'package:speedplanner/utils/AppBar.dart';
 //!import 'package:speedplanner/utils/AppBar.dart';
 import 'package:speedplanner/utils/colors.dart';
@@ -34,7 +36,15 @@ class _AddCourseState extends State<AddCourse> {
   var startArr = [];
   var finishArr = [];
 
+  String formatter = '';
+
   Map data = {};
+
+  void getCurrentDate() async {
+    DateTime now = new DateTime.now();
+    formatter = DateFormat('yMMMd').format(now);
+    print(formatter);
+  }
 
   void timeString(TextEditingController day, TextEditingController start,
       TextEditingController finish) {
@@ -71,45 +81,36 @@ class _AddCourseState extends State<AddCourse> {
   String timeMessage = '';
 
   timeShow(message) {
-    String day, start, finish;
-    String day2, start2, finish2;
-    String day3, start3, finish3;
-
+    // if (dayArr.isEmpty || startArr.isEmpty || finishArr.isEmpty) {
+    //   message = 'No hay cursos disponibles';
+    // } else if (dayArr.length == 1 &&
+    //     startArr.length == 1 &&
+    //     finishArr.length == 1) {
+    //   message = '${dayArr[0]}: ${startArr[0]} - ${finishArr[0]}\n';
+    // } else if (dayArr.length == 2 &&
+    //     startArr.length == 2 &&
+    //     finishArr.length == 2) {
+    //   message = '${dayArr[0]}: ${startArr[0]} - ${finishArr[0]}\n'
+    //       '${dayArr[1]}: ${startArr[1]} - ${finishArr[1]}';
+    // } else if (dayArr.length == 3 &&
+    //     startArr.length == 3 &&
+    //     finishArr.length == 3) {
+    //   message = '${dayArr[0]}: ${startArr[0]} - ${finishArr[0]}\n'
+    //       '${dayArr[1]}: ${startArr[1]} - ${finishArr[1]}\n'
+    //       '${dayArr[2]}: ${startArr[2]} - ${finishArr[2]}';
+    // }
     if (dayArr.isEmpty || startArr.isEmpty || finishArr.isEmpty) {
       message = 'No hay cursos disponibles';
-    } else if (dayArr.length == 1 &&
-        startArr.length == 1 &&
-        finishArr.length == 1) {
-      day = dayArr[0];
-      start = startArr[0];
-      finish = finishArr[0];
-      message = '$day: $start - $finish\n';
-    } else if (dayArr.length == 2 &&
-        startArr.length == 2 &&
-        finishArr.length == 2) {
-      day = dayArr[0];
-      start = startArr[0];
-      finish = finishArr[0];
-      day2 = dayArr[1];
-      start2 = startArr[1];
-      finish2 = finishArr[1];
-      message = '$day: $start - $finish\n'
-          '$day2: $start2 - $finish2';
-    } else if (dayArr.length == 3 &&
-        startArr.length == 3 &&
-        finishArr.length == 3) {
-      day = dayArr[0];
-      start = startArr[0];
-      finish = finishArr[0];
-      day2 = dayArr[1];
-      start2 = startArr[1];
-      finish2 = finishArr[1];
-      day3 = dayArr[2];
-      start3 = startArr[2];
-      finish3 = finishArr[2];
-      message = '$day: $start - $finish\n'
-          '$day2: $start2 - $finish2\n'
-          '$day3: $start3 - $finish3';
+    } else if (dayArr.length == startArr.length &&
+        finishArr.length == startArr.length) {
+      for (var i = 0; i < dayArr.length; i++) {
+        if (i == 0)
+          message = '${dayArr[i]}: ${startArr[i]} - ${finishArr[i]}\n';
+        else if (i == dayArr.length - 1)
+          message += '${dayArr[i]}: ${startArr[i]} - ${finishArr[i]}';
+        else
+          message += '${dayArr[i]}: ${startArr[i]} - ${finishArr[i]}\n';
+      }
     }
 
     return message;
@@ -119,52 +120,60 @@ class _AddCourseState extends State<AddCourse> {
       id, token, name, description, email, color) async {
     print(id);
     print(token);
-    var urlCourses = Uri.parse(
-        'https://speedplanner-mobile.herokuapp.com/api/users/$id/courses');
+    if (dayArr.length != 0 ||
+        nameText.text.isNotEmpty ||
+        descText.text.isNotEmpty ||
+        emailText.text.isNotEmpty) {
+      var urlCourses = Uri.parse(
+          'https://speedplanner-mobile.herokuapp.com/api/users/$id/courses');
 
-    http.Response response = await http.post(urlCourses,
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-          'Authorization': token,
-        },
-        body: jsonEncode(<String, String>{
-          'name': name,
-          'description': description,
-          'email': email,
-          'color': color
-        }));
-    if (response.statusCode == 200) {
-      print("Curso creado: $name");
-      for (var i = 0; i < dayArr.length; i++) {
-        Map dataCourse = jsonDecode(utf8.decode(response.bodyBytes));
-        int idCourse = dataCourse['id'];
-        http.Response responseTime = await http.post(
-            Uri.parse(
-                'https://speedplanner-mobile.herokuapp.com/api/courses/$idCourse/times'),
-            headers: <String, String>{
-              'Content-Type': 'application/json',
-              'Authorization':
-                  'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnaW5vIn0.bCcj99sO-yCeKqTfxBEUMinv8ei5EEsSDZy-mG1tjHaE6Z4Pn9YB7bJCrUOaqp-1pV1vXIBiPcNTY7KFWh12Zw'
-            },
-            body: jsonEncode(<String, String>{
-              'day': dayArr[i],
-              'startTime': startArr[i],
-              'finishTime': finishArr[i],
-            }));
-        if (response.statusCode == 200) {
-          print("Tiempo agregado");
-          Navigator.pop(context, '/addCourse');
+      http.Response response = await http.post(urlCourses,
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+            'Authorization': token,
+          },
+          body: jsonEncode(<String, String>{
+            'name': name,
+            'description': description,
+            'email': email,
+            'color': color
+          }));
+      if (response.statusCode == 200) {
+        print("Curso creado: $name");
+        for (var i = 0; i < dayArr.length; i++) {
+          Map dataCourse = jsonDecode(utf8.decode(response.bodyBytes));
+          int idCourse = dataCourse['id'];
+          http.Response responseTime = await http.post(
+              Uri.parse(
+                  'https://speedplanner-mobile.herokuapp.com/api/courses/$idCourse/times'),
+              headers: <String, String>{
+                'Content-Type': 'application/json',
+                'Authorization':
+                    'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnaW5vIn0.bCcj99sO-yCeKqTfxBEUMinv8ei5EEsSDZy-mG1tjHaE6Z4Pn9YB7bJCrUOaqp-1pV1vXIBiPcNTY7KFWh12Zw'
+              },
+              body: jsonEncode(<String, String>{
+                'day': dayArr[i],
+                'startTime': startArr[i],
+                'finishTime': finishArr[i],
+              }));
+          if (response.statusCode == 200) {
+            print("Tiempo agregado");
+            Navigator.pop(context, '/addCourse');
+          }
         }
+      } else {
+        print("Error en la creación");
       }
+      return response;
     } else {
-      print("Error en la creación");
+      print("Error");
     }
-    return response;
   }
 
   @override
   void initState() {
     super.initState();
+    getCurrentDate();
     timeMessage = timeShow(timeMessage);
     changeColor(firstChoice);
   }
@@ -179,6 +188,7 @@ class _AddCourseState extends State<AddCourse> {
 
     return Scaffold(
       appBar: appBarSpeedplanner(name),
+      resizeToAvoidBottomInset: false,
       body: Container(
         decoration: BoxDecoration(color: Color(0xffE9EBF8)),
         child: Column(
@@ -424,7 +434,7 @@ class _AddCourseState extends State<AddCourse> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(top: 65),
+              padding: EdgeInsets.only(top: 85),
               child: Container(
                   color: dateBG,
                   width: double.infinity,
@@ -440,7 +450,7 @@ class _AddCourseState extends State<AddCourse> {
                             decoration: BoxDecoration(color: Color(0xffD7DAEB)),
                             padding: EdgeInsets.symmetric(vertical: 15),
                             child: Text(
-                              'Date: 21 de Abril del 2021',
+                              'Date: ' + formatter,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                   color: Color(0xff8377D1),

@@ -23,6 +23,7 @@ class GetAllCoursesByUserIdService {
               Uri.parse(
                   'https://speedplanner-mobile.herokuapp.com/api/courses/$controlId/times'),
               headers: {HttpHeaders.authorizationHeader: token});
+
           Map timesResponse = jsonDecode(utf8.decode(responseTimes.bodyBytes));
           for (int j = 0; j < timesResponse['content'].length; j++) {
             times.add(new Time(
