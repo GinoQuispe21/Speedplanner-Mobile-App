@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -9,12 +11,21 @@ import 'package:speedplanner/utils/AppBar.dart';
 import 'package:speedplanner/utils/colors.dart';
 import 'package:speedplanner/utils/dateFooter.dart';
 import 'package:speedplanner/utils/showDialogSchedule.dart';
+import 'package:speedplanner/pages/addGroup.dart';
 
 class CreateTimedTask extends StatefulWidget {
   final String token;
   final String username;
   final List<StudyGroup> listGroup;
-  const CreateTimedTask({this.token, this.username, this.listGroup, Key key})
+  final int courseId;
+  final String courseName;
+  const CreateTimedTask(
+      {this.token,
+      this.username,
+      this.listGroup,
+      this.courseId,
+      this.courseName,
+      Key key})
       : super(key: key);
 
   @override
@@ -77,6 +88,21 @@ class _CreateTimedTaskState extends State<CreateTimedTask> {
     formatter = DateFormat('yMMMd').format(now);
     print(formatter);
   }
+
+  //Prueba para hacer setState al regresar
+  /* FutureOr onGoBack(dynamic value) {
+    setState(() {});
+  }
+
+  void navigateToAddGroup() {
+    Route route = MaterialPageRoute(
+        builder: (context) => AddGroup(
+            courseId: widget.courseId,
+            token: widget.token,
+            username: widget.username,
+            courseName: widget.courseName));
+    Navigator.push(context, route).then(onGoBack);
+  } */
 
   @override
   void initState() {
@@ -350,7 +376,17 @@ class _CreateTimedTaskState extends State<CreateTimedTask> {
                                     heroTag: "btn4",
                                     backgroundColor: Color(0x00000000),
                                     elevation: 0,
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => AddGroup(
+                                                  courseId: widget.courseId,
+                                                  token: widget.token,
+                                                  username: widget.username,
+                                                  courseName:
+                                                      widget.courseName)));
+                                    },
                                     child: const Icon(
                                       Icons.add_circle_outline_sharp,
                                       color: Color(0xff2EB18B),

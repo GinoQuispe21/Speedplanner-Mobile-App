@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 Color greenColor = Color(0xff30B18B);
 Color purpleColor = Color(0xff8377d1);
+Color scrollColor = Color(0xF56E63B6);
 Color backgroundColor = Color(0xffE9EBF8);
 Color greyColor = Color(0xff161616);
 Color textFieldColor = Color(0xff707070);

@@ -68,9 +68,9 @@ class GroupService {
               courseName,
               members));
           members = [];
-          print("Grupo agregado con Id" + groups[i].id.toString());
-          print("Grupo agregado con descripción " + groups[i].description);
-          print("Grupo agregado con curso: " + courseName);
+          print("Grupo leído con Id" + groups[i].id.toString());
+          print("Grupo leído con descripción " + groups[i].description);
+          print("Grupo leído con curso: " + courseName);
         }
       }
     } catch (e) {
