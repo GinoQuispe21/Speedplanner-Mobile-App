@@ -65,6 +65,8 @@ class _DetailCourseState extends State<DetailCourse> {
                               token: widget.token,
                               username: widget.username,
                               listGroup: listGroup,
+                              courseId: widget.course.id,
+                              courseName: widget.course.name,
                             )));
               },
               style: ElevatedButton.styleFrom(
@@ -89,6 +91,8 @@ class _DetailCourseState extends State<DetailCourse> {
                               token: widget.token,
                               username: widget.username,
                               listGroup: listGroup,
+                              courseId: widget.course.id,
+                              courseName: widget.course.name,
                             )));
               },
               style: ElevatedButton.styleFrom(

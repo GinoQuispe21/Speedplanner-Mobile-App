@@ -7,12 +7,21 @@ import 'package:speedplanner/utils/AppBar.dart';
 import 'package:speedplanner/utils/colors.dart';
 import 'package:speedplanner/utils/dateFooter.dart';
 import 'package:speedplanner/utils/showDialogSchedule.dart';
+import 'package:speedplanner/pages/addGroup.dart';
 
 class CreateSimpleTask extends StatefulWidget {
   final String token;
   final String username;
   final List<StudyGroup> listGroup;
-  const CreateSimpleTask({this.token, this.username, this.listGroup, Key key})
+  final int courseId;
+  final String courseName;
+  const CreateSimpleTask(
+      {this.token,
+      this.username,
+      this.listGroup,
+      this.courseId,
+      this.courseName,
+      Key key})
       : super(key: key);
 
   @override
@@ -288,7 +297,22 @@ class _CreateSimpleTaskState extends State<CreateSimpleTask> {
                                           heroTag: "btn4",
                                           backgroundColor: Color(0x00000000),
                                           elevation: 0,
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            //TODO: mandar a pantall addGroup
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        AddGroup(
+                                                          courseId:
+                                                              widget.courseId,
+                                                          token: widget.token,
+                                                          username:
+                                                              widget.username,
+                                                          courseName:
+                                                              widget.courseName,
+                                                        )));
+                                          },
                                           child: const Icon(
                                             Icons.add_circle_outline_sharp,
                                             color: Color(0xff8980D3),
