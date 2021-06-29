@@ -14,7 +14,7 @@ Widget emptyFieldsDialog({context}) {
     ),
     titlePadding: EdgeInsets.all(20),
     content: Container(
-      child: Text('No deje espacios vacíos',
+      child: Text('No deje campos vacíos',
           textAlign: TextAlign.center,
           style: TextStyle(
               color: Colors.white,
@@ -33,9 +33,7 @@ Widget emptyFieldsDialog({context}) {
             child: Text(
               'Aceptar',
               style: TextStyle(
-                  color: purpleColor,
-                  fontSize: 16,
-                  fontStyle: FontStyle.italic),
+                  color: alert, fontSize: 16, fontStyle: FontStyle.italic),
             ),
             style: ButtonStyle(
                 padding: MaterialStateProperty.all<EdgeInsets>(
