@@ -3,12 +3,17 @@ import 'package:speedplanner/utils/AppBar.dart';
 import 'package:speedplanner/utils/colors.dart';
 import 'package:speedplanner/utils/dateFooter.dart';
 import 'package:intl/intl.dart';
+import 'package:speedplanner/models/SaveMember.dart';
+import 'package:speedplanner/utils/emptyFieldsDialog.dart';
+import 'package:speedplanner/Services/AddGroupService.dart';
 
 class AddGroup extends StatefulWidget {
-  final int id;
+  final int courseId;
   final String token;
   final String username;
-  const AddGroup({this.id, this.token, this.username, Key key})
+  final String courseName;
+  const AddGroup(
+      {this.courseId, this.token, this.username, this.courseName, Key key})
       : super(key: key);
 
   @override
@@ -19,9 +24,11 @@ class _AddGroupState extends State<AddGroup> {
   String formatter = '';
   var groupNameTxt = TextEditingController();
   var groupDescriptionTxt = TextEditingController();
-  var courseTxt = TextEditingController();
   var memberNameTxt = TextEditingController();
   var memberDescriptionTxt = TextEditingController();
+  List<SaveMember> members = [];
+  ScrollController scroll = new ScrollController(initialScrollOffset: 0);
+  AddGroupService addGroupService = new AddGroupService();
 
   void getDate() {
     DateTime now = new DateTime.now();
@@ -33,6 +40,16 @@ class _AddGroupState extends State<AddGroup> {
   void initState() {
     super.initState();
     getDate();
+  }
+
+  bool memberFieldsEmpty() {
+    return memberNameTxt.text.isEmpty || memberDescriptionTxt.text.isEmpty;
+  }
+
+  Future<void> createGroup() async {
+    addGroupService.groupName = groupNameTxt.text;
+    addGroupService.groupDescription = groupDescriptionTxt.text;
+    addGroupService.createGroup(widget.token, widget.courseId, members);
   }
 
   Future<void> addMemberDialog() async {
@@ -104,7 +121,17 @@ class _AddGroupState extends State<AddGroup> {
                       ),
                       style: alertBtnStyle(),
                       onPressed: () {
-                        //TODO: agregar mem a lista
+                        if (!memberFieldsEmpty()) {
+                          members.add(new SaveMember(
+                              memberNameTxt.text, memberDescriptionTxt.text));
+                          setState(() {
+                            memberNameTxt.text = '';
+                            memberDescriptionTxt.text = '';
+                          });
+                          Navigator.pop(context);
+                        } else {
+                          _showDialog();
+                        }
                       }),
                   ElevatedButton(
                     onPressed: () => Navigator.pop(context),
@@ -118,6 +145,19 @@ class _AddGroupState extends State<AddGroup> {
               )
             ],
           );
+        });
+  }
+
+  bool groupFieldsEmpty() {
+    return groupNameTxt.text.isEmpty || groupDescriptionTxt.text.isEmpty;
+  }
+
+  Future<void> _showDialog() async {
+    return showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return emptyFieldsDialog(context: context);
         });
   }
 
@@ -206,10 +246,50 @@ class _AddGroupState extends State<AddGroup> {
                   ],
                 ),
                 Container(
-                  height: size.height / 7,
-                  width: size.width * 0.85,
-                  //decoration: BoxDecoration(color: Colors.purple[100]),
-                ),
+                    height: size.height / 7,
+                    width: size.width * 0.85,
+                    //decoration: BoxDecoration(color: Colors.purple[100]),
+                    child: members.isEmpty
+                        ? Text(
+                            'Aún no se han agregado miembros',
+                            style: memberStyle(),
+                          )
+                        : RawScrollbar(
+                            controller: scroll,
+                            isAlwaysShown: true,
+                            thumbColor: scrollColor,
+                            radius: Radius.circular(8),
+                            child: ListView.builder(
+                                itemCount: members.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return Container(
+                                      width: double.infinity,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 10.0),
+                                            child: Text(
+                                              '${members[index].name}',
+                                              textAlign: TextAlign.left,
+                                              style: memberStyle(),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 10.0),
+                                            child: Text(
+                                              '-${members[index].description}',
+                                              textAlign: TextAlign.left,
+                                              style: memberStyle(),
+                                            ),
+                                          )
+                                        ],
+                                      ));
+                                }),
+                          )),
                 Row(
                   children: <Widget>[
                     Padding(
@@ -250,10 +330,9 @@ class _AddGroupState extends State<AddGroup> {
                   children: <Widget>[
                     SizedBox(
                       width: size.width * 0.85,
-                      child: TextField(
-                        controller: courseTxt,
+                      child: Text(
+                        '${widget.courseName}',
                         style: fields(),
-                        decoration: fieldDecoration(),
                       ),
                     )
                   ],
@@ -264,7 +343,16 @@ class _AddGroupState extends State<AddGroup> {
                       child: Text('Crear Grupo', style: btnText()),
                       style: btnStyle(),
                       onPressed: () {
-                        //TODO: Post
+                        if (!groupFieldsEmpty()) {
+                          createGroup();
+                          setState(() {
+                            groupNameTxt.text = '';
+                            groupDescriptionTxt.text = '';
+                            members = [];
+                          });
+                        } else {
+                          _showDialog();
+                        }
                       }),
                 )
               ],
@@ -296,7 +384,7 @@ TextStyle subtitle() {
       fontWeight: FontWeight.bold);
 }
 
-TextStyle members() {
+TextStyle memberStyle() {
   return TextStyle(
     fontSize: 18,
     color: purpleColor,
