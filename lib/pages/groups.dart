@@ -92,8 +92,8 @@ class _GroupsState extends State<Groups> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-        //TODO: Eliminar FAB al terminar con AddGroup
-        floatingActionButton: Padding(
+        //Eliminar FAB al terminar con AddGroup
+        /* floatingActionButton: Padding(
           padding: const EdgeInsets.only(bottom: 35),
           child: FloatingActionButton(
             heroTag: "addGroupBtn",
@@ -103,8 +103,7 @@ class _GroupsState extends State<Groups> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => AddGroup(
-                          id: widget.id,
+                      builder: (context) => AddGroup(                          
                           token: widget.token,
                           username: username)));
             },
@@ -115,7 +114,7 @@ class _GroupsState extends State<Groups> {
               size: 50,
             ),
           ),
-        ),
+        ) ,*/
         body: loading
             ? loadingGroups()
             : groupList.isEmpty
