@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
@@ -129,8 +127,12 @@ class _CoursesState extends State<Courses> {
                                 child: ListView.builder(
                                   itemCount: listCourse.length,
                                   itemBuilder: (context, index) {
-                                    return cardCourse(listCourse[index],
-                                        widget.username, widget.token, context);
+                                    return cardCourse(
+                                        listCourse[index],
+                                        widget.username,
+                                        widget.token,
+                                        widget.id,
+                                        context);
                                   },
                                 ),
                               ),
@@ -151,7 +153,8 @@ class _CoursesState extends State<Courses> {
   }
 }
 
-Widget cardCourse(Course course, String username, String token, context) {
+Widget cardCourse(
+    Course course, String username, String token, int userId, context) {
   int colorCard = int.parse(course.color);
   return Container(
     child: Padding(
@@ -219,9 +222,11 @@ Widget cardCourse(Course course, String username, String token, context) {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => DetailCourse(
-                                          course: course,
-                                          token: token,
-                                          username: username)),
+                                            course: course,
+                                            token: token,
+                                            username: username,
+                                            userId: userId,
+                                          )),
                                 );
                               },
                               child: Text(
