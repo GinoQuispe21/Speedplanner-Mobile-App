@@ -9,6 +9,7 @@ import 'package:speedplanner/pages/taskDetails.dart';
 
 void main() {
   runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
     theme: ThemeData(fontFamily: 'Poppins'),
     initialRoute: '/',
     routes: {
