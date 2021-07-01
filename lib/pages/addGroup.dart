@@ -28,7 +28,7 @@ class _AddGroupState extends State<AddGroup> {
   var memberNameTxt = TextEditingController();
   var memberDescriptionTxt = TextEditingController();
   List<SaveMember> members = [];
-  ScrollController scroll = new ScrollController(initialScrollOffset: 0);
+  var _scrollController = ScrollController(initialScrollOffset: 0);
   AddGroupService addGroupService = new AddGroupService();
 
   void getDate() {
@@ -367,43 +367,37 @@ class _AddGroupState extends State<AddGroup> {
                                 style: memberStyle(),
                               ),
                             )
-                          : RawScrollbar(
-                              controller: scroll,
-                              isAlwaysShown: true,
-                              thumbColor: scrollColor,
-                              radius: Radius.circular(8),
-                              child: ListView.builder(
-                                  itemCount: members.length,
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    return Container(
-                                        width: double.infinity,
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10.0),
-                                              child: Text(
-                                                '${members[index].name}',
-                                                textAlign: TextAlign.left,
-                                                style: memberStyle(),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10.0),
-                                              child: Text(
-                                                '- ${members[index].description}',
-                                                textAlign: TextAlign.left,
-                                                style: memberStyle(),
-                                              ),
-                                            )
-                                          ],
-                                        ));
-                                  }),
-                            )),
+                          : ListView.builder(
+                              controller: _scrollController,
+                              itemCount: members.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return Container(
+                                    width: double.infinity,
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10.0),
+                                          child: Text(
+                                            '${members[index].name}',
+                                            textAlign: TextAlign.left,
+                                            style: memberStyle(),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10.0),
+                                          child: Text(
+                                            '- ${members[index].description}',
+                                            textAlign: TextAlign.left,
+                                            style: memberStyle(),
+                                          ),
+                                        )
+                                      ],
+                                    ));
+                              })),
                   Row(
                     children: <Widget>[
                       Padding(

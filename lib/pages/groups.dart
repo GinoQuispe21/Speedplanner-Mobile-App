@@ -186,44 +186,38 @@ class _GroupsState extends State<Groups> {
             ? loadingGroups()
             : groupList.isEmpty
                 ? noGroups()
-                : RawScrollbar(
-                    isAlwaysShown: true,
-                    controller: mainScroll,
-                    thumbColor: scrollColor,
-                    radius: Radius.circular(8),
+                : Container(
+                    height: size.height,
+                    width: double.infinity,
+                    decoration: BoxDecoration(color: Color(0xffE9EBF8)),
                     child: Container(
-                        height: size.height,
-                        width: double.infinity,
-                        decoration: BoxDecoration(color: Color(0xffE9EBF8)),
-                        child: Container(
-                          child: Stack(
+                      child: Stack(
+                        children: <Widget>[
+                          Positioned(
+                              child: Column(
                             children: <Widget>[
-                              Positioned(
-                                  child: Column(
-                                children: <Widget>[
-                                  Container(
-                                    height: size.height / 1.57,
-                                    width: double.infinity,
-                                    child: ListView.builder(
-                                        controller: scrollController,
-                                        itemCount: groupList.length,
-                                        itemBuilder: (context, index) {
-                                          return groupCard(groupList[index],
-                                              name, scrollController, context);
-                                        }),
-                                  )
-                                ],
-                              )),
-                              Positioned(
-                                bottom: 0,
-                                child: dateFooter(
-                                    context: context,
-                                    currentDate: 'Date: ' + formatter),
+                              Container(
+                                height: size.height / 1.57,
+                                width: double.infinity,
+                                child: ListView.builder(
+                                    controller: scrollController,
+                                    itemCount: groupList.length,
+                                    itemBuilder: (context, index) {
+                                      return groupCard(groupList[index], name,
+                                          scrollController, context);
+                                    }),
                               )
                             ],
-                          ),
-                        )),
-                  ));
+                          )),
+                          Positioned(
+                            bottom: 0,
+                            child: dateFooter(
+                                context: context,
+                                currentDate: 'Date: ' + formatter),
+                          )
+                        ],
+                      ),
+                    )));
   }
 }
 
