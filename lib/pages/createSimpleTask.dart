@@ -298,7 +298,6 @@ class _CreateSimpleTaskState extends State<CreateSimpleTask> {
                                           backgroundColor: Color(0x00000000),
                                           elevation: 0,
                                           onPressed: () {
-                                            //TODO: mandar a pantall addGroup
                                             Navigator.push(
                                                 context,
                                                 MaterialPageRoute(

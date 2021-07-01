@@ -12,7 +12,6 @@ import 'package:speedplanner/services/DeleteUpdateCourse.dart';
 import 'package:speedplanner/services/GetAllGroupsByCourseId.dart';
 import 'package:speedplanner/services/GetSimpleTaskById.dart';
 import 'package:speedplanner/utils/AppBar.dart';
-import 'package:speedplanner/utils/RefreshWidget.dart';
 import 'package:speedplanner/utils/colors.dart';
 import 'package:speedplanner/utils/dateFooter.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
