@@ -263,7 +263,7 @@ class _AddGroupState extends State<AddGroup> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: appBarSpeedplanner(widget.username),
+      appBar: appBarSpeedplanner(context, widget.username),
       body: Container(
         height: size.height,
         width: double.infinity,

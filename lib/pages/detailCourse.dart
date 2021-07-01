@@ -613,7 +613,7 @@ class _DetailCourseState extends State<DetailCourse> {
                 ),
               ),
             ),
-      appBar: appBarSpeedplanner('${widget.username}'),
+      appBar: appBarSpeedplanner(context, '${widget.username}'),
       body: widgetDetailCourse(),
     );
   }

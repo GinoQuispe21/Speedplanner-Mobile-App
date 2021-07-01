@@ -142,7 +142,7 @@ class _TaskDetailsState extends State<TaskDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: appBarSpeedplanner('${widget.username}'),
+        appBar: appBarSpeedplanner(context, '${widget.username}'),
         resizeToAvoidBottomInset: false,
         body: Container(
           decoration: BoxDecoration(color: Color(0xffE9EBF8)),

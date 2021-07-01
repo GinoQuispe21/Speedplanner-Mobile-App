@@ -1,7 +1,60 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:speedplanner/utils/colors.dart';
 
-Widget appBarSpeedplanner(name) {
+openPopPupSettings(context) {
+  Alert(title: "Configuración", context: context).show();
+}
+
+openLogOut(context) {
+  Alert(
+      style: AlertStyle(
+        backgroundColor: backgroundColor,
+        descStyle: TextStyle(color: Color(0xff9C9DA6), fontSize: 15),
+        titleStyle: TextStyle(
+            color: greenColor, fontWeight: FontWeight.bold, fontSize: 25),
+      ),
+      title: "¿Estás seguro?",
+      desc:
+          "Al cerrar sesión  estara obligado a iniciar sesión para poder ingresar nuevamente a Speedplanner",
+      context: context,
+      buttons: [
+        DialogButton(
+            child: Text(
+              "Canecelar",
+              style: TextStyle(color: Colors.white, fontSize: 17),
+            ),
+            onPressed: () => Navigator.pop(context),
+            color: Colors.grey[400]),
+        DialogButton(
+          child: Text(
+            "Salir",
+            style: TextStyle(color: Colors.white, fontSize: 17),
+          ),
+          onPressed: () {
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              '/signin',
+              (Route<dynamic> route) => false,
+            );
+          },
+          color: greenColor,
+        )
+      ]).show();
+}
+
+onSelected(context, item) {
+  switch (item) {
+    case 1:
+      openPopPupSettings(context);
+      break;
+    case 2:
+      openLogOut(context);
+      break;
+  }
+}
+
+Widget appBarSpeedplanner(context, name) {
   return AppBar(
     title: Text('Speedplanner'),
     flexibleSpace: Container(
@@ -39,7 +92,20 @@ Widget appBarSpeedplanner(name) {
               color: Colors.white,
             ),
           )),
-      Padding(
+      PopupMenuButton<int>(
+        onSelected: (item) => onSelected(context, item),
+        itemBuilder: (context) => [
+          PopupMenuItem<int>(
+            value: 1,
+            child: Text("Configruación"),
+          ),
+          PopupMenuItem<int>(
+            value: 2,
+            child: Text("Cerrar Sesión"),
+          )
+        ],
+      ),
+      /*Padding(
         padding: EdgeInsets.only(right: 10.0),
         child: GestureDetector(
           onTap: () {
@@ -51,7 +117,7 @@ Widget appBarSpeedplanner(name) {
             color: Colors.white,
           ),
         ),
-      )
+      )*/
     ],
   );
 }

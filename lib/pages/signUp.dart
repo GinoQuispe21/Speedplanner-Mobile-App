@@ -33,6 +33,28 @@ class _SignUpState extends State<SignUp> {
   bool _isHidden = true;
   bool aceptTOSandPP = false;
 
+  _errorShortPassword() {
+    Alert(
+        context: context,
+        style: AlertStyle(
+          backgroundColor: Color(0xffF87575),
+          descStyle: TextStyle(color: Colors.white, fontSize: 15),
+          titleStyle: TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25),
+        ),
+        title: "Error",
+        desc: "La contraseña es muy corta, ingrese otra por favor",
+        buttons: [
+          DialogButton(
+              child: Text(
+                "Aceptar",
+                style: TextStyle(color: Color(0xffF87575), fontSize: 17),
+              ),
+              onPressed: () => Navigator.pop(context),
+              color: Colors.white),
+        ]).show();
+  }
+
   _errorIncompleteData() {
     Alert(
         context: context,
@@ -86,12 +108,16 @@ class _SignUpState extends State<SignUp> {
       print("aaaaaaaaaaaaaaaaaaaa");
       _errorIncompleteData();
     } else {
-      if (aceptTOSandPP == false) {
-        print("no acepte");
-        _errorAceptTOSandPP();
+      if (password.text.length < 7) {
+        _errorShortPassword();
       } else {
-        print("acepte");
-        _register();
+        if (aceptTOSandPP == false) {
+          print("no acepte");
+          _errorAceptTOSandPP();
+        } else {
+          print("acepte");
+          _register();
+        }
       }
       //_register();
     }

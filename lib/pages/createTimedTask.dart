@@ -121,7 +121,7 @@ class _CreateTimedTaskState extends State<CreateTimedTask> {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: appBarSpeedplanner('hola'),
+      appBar: appBarSpeedplanner(context, 'hola'),
       body: Container(
         height: size.height,
         width: double.infinity,

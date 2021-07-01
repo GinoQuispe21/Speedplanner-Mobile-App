@@ -257,7 +257,7 @@ class _CreateSimpleTaskState extends State<CreateSimpleTask> {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
         resizeToAvoidBottomInset: false,
-        appBar: appBarSpeedplanner('${widget.username}'),
+        appBar: appBarSpeedplanner(context, '${widget.username}'),
         body: Container(
             height: size.height,
             width: double.infinity,
