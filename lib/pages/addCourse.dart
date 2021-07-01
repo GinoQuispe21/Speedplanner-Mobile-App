@@ -184,7 +184,7 @@ class _AddCourseState extends State<AddCourse> {
     print(name);
 
     return Scaffold(
-      appBar: appBarSpeedplanner(name),
+      appBar: appBarSpeedplanner(context, name),
       resizeToAvoidBottomInset: false,
       body: Container(
         decoration: BoxDecoration(color: Color(0xffE9EBF8)),
