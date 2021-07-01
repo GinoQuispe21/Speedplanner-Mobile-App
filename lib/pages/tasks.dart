@@ -211,7 +211,7 @@ Widget taskCourse(Course course, int task, context, String token, int id,
                         fontStyle: FontStyle.italic),
                   ),
                   Text(
-                    'Total de Tareas por realizar: ${task}',
+                    'Total de Tareas registradas: ${task}',
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,

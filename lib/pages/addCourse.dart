@@ -120,10 +120,7 @@ class _AddCourseState extends State<AddCourse> {
       id, token, name, description, email, color) async {
     print(id);
     print(token);
-    if (dayArr.length != 0 ||
-        nameText.text.isNotEmpty ||
-        descText.text.isNotEmpty ||
-        emailText.text.isNotEmpty) {
+    if (dayArr.length != 0) {
       var urlCourses = Uri.parse(
           'https://speedplanner-mobile.herokuapp.com/api/users/$id/courses');
 
@@ -156,11 +153,11 @@ class _AddCourseState extends State<AddCourse> {
                 'startTime': startArr[i],
                 'finishTime': finishArr[i],
               }));
-          if (response.statusCode == 200) {
+          if (responseTime.statusCode == 200) {
             print("Tiempo agregado");
-            Navigator.pop(context, '/addCourse');
           }
         }
+        Navigator.pop(context, '/addCourse');
       } else {
         print("Error en la creación");
       }
