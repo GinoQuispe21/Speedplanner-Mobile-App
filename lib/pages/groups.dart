@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:speedplanner/Services/UserService.dart';
+import 'package:speedplanner/pages/addGroup.dart';
 import 'package:speedplanner/utils/colors.dart';
 import 'package:speedplanner/utils/dateFooter.dart';
 import 'package:speedplanner/models/Group.dart';
@@ -9,7 +12,6 @@ import 'package:speedplanner/Services/GetAllCourses.dart';
 import 'package:speedplanner/Services/ProfileService.dart';
 import 'package:speedplanner/models/Member.dart';
 import 'package:speedplanner/models/Course.dart';
-import 'package:speedplanner/pages/addGroup.dart';
 
 class Groups extends StatefulWidget {
   final int id;
@@ -37,6 +39,76 @@ class _GroupsState extends State<Groups> {
   ScrollController scrollController =
       new ScrollController(initialScrollOffset: 0);
   ScrollController mainScroll = new ScrollController(initialScrollOffset: 0);
+
+  _dialogCourses(context) {
+    return showDialog(
+        context: context,
+        builder: (ctxt) => new AlertDialog(
+              title: Center(
+                  child: Text(
+                "Crear Curso",
+                style: TextStyle(
+                    color: purpleColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 25),
+              )),
+              backgroundColor: backgroundColor,
+              content: Container(
+                height: 63.0 * courses.length,
+                width: 300,
+                child: Column(
+                  children: [
+                    Text("Elija un curso para el grupo",
+                        style:
+                            TextStyle(color: Color(0xff9C9DA6), fontSize: 15)),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Container(
+                        height: 50.0 * courses.length,
+                        width: 300,
+                        child: ListView.builder(
+                          itemCount: courses.length,
+                          itemBuilder: (context, index) {
+                            return InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => AddGroup(
+                                              courseId: courses[index].id,
+                                              token: widget.token,
+                                              username: username,
+                                              courseName: courses[index].name,
+                                            )));
+                              },
+                              child: Card(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color:
+                                        Color(int.parse(courses[index].color)),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: Text(
+                                      courses[index].name,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ));
+  }
 
   void getDate() {
     DateTime now = new DateTime.now();
@@ -93,19 +165,14 @@ class _GroupsState extends State<Groups> {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
         //Eliminar FAB al terminar con AddGroup
-        /* floatingActionButton: Padding(
+        floatingActionButton: Padding(
           padding: const EdgeInsets.only(bottom: 35),
           child: FloatingActionButton(
             heroTag: "addGroupBtn",
             backgroundColor: Color(0x00000000),
             elevation: 0,
             onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => AddGroup(                          
-                          token: widget.token,
-                          username: username)));
+              _dialogCourses(context);
             },
             child: const Icon(
               //
@@ -114,7 +181,7 @@ class _GroupsState extends State<Groups> {
               size: 50,
             ),
           ),
-        ) ,*/
+        ),
         body: loading
             ? loadingGroups()
             : groupList.isEmpty
@@ -180,15 +247,25 @@ Widget loadingGroups() {
   return Container(
     decoration: BoxDecoration(color: Color(0xffE9EBF8)),
     child: Center(
-      child: Text(
-        'Cargando grupos. Por favor espere...',
-        style: TextStyle(
+        child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          child: Center(
+              child: SpinKitFadingCircle(
             color: purpleColor,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            fontStyle: FontStyle.italic),
-      ),
-    ),
+            size: 50,
+          )),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Text(
+            'Cargando grupos',
+            style: TextStyle(color: purpleColor),
+          ),
+        )
+      ],
+    )),
   );
 }
 
@@ -229,6 +306,27 @@ Widget groupCard(Group group, String name, ScrollController scrollController,
             padding: const EdgeInsets.all(10.0),
             child: Column(
               children: <Widget>[
+                Row(
+                  children: [
+                    Text(
+                      'Curso',
+                      style: detailTitles(),
+                    )
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text(
+                      '${group.courseName}',
+                      style: TextStyle(fontStyle: FontStyle.italic),
+                    )
+                  ],
+                ),
+                Divider(
+                  height: 20.0,
+                  thickness: 1.5,
+                  color: Color(0Xff707070),
+                ),
                 Row(
                   children: [
                     Text(
@@ -284,27 +382,6 @@ Widget groupCard(Group group, String name, ScrollController scrollController,
                               : SizedBox()
                         ],
                       ),
-                    )
-                  ],
-                ),
-                Divider(
-                  height: 20.0,
-                  thickness: 1.5,
-                  color: Color(0Xff707070),
-                ),
-                Row(
-                  children: [
-                    Text(
-                      'Curso',
-                      style: detailTitles(),
-                    )
-                  ],
-                ),
-                Row(
-                  children: [
-                    Text(
-                      '${group.courseName}',
-                      style: TextStyle(fontStyle: FontStyle.italic),
                     )
                   ],
                 ),

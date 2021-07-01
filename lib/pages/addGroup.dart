@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:speedplanner/utils/AppBar.dart';
 import 'package:speedplanner/utils/colors.dart';
 import 'package:speedplanner/utils/dateFooter.dart';
@@ -50,6 +51,103 @@ class _AddGroupState extends State<AddGroup> {
     addGroupService.groupName = groupNameTxt.text;
     addGroupService.groupDescription = groupDescriptionTxt.text;
     addGroupService.createGroup(widget.token, widget.courseId, members);
+  }
+
+  _addMemberPopPup() {
+    Alert(
+        context: context,
+        style: AlertStyle(
+          backgroundColor: backgroundColor,
+          descStyle: TextStyle(color: Color(0xff9C9DA6), fontSize: 15),
+          titleStyle: TextStyle(
+              color: purpleColor, fontWeight: FontWeight.bold, fontSize: 25),
+        ),
+        title: "Agregar Miembro",
+        desc: "Registre al miembre del grupo",
+        content: Container(
+          width: 300,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  "Nombre",
+                  style: TextStyle(color: purpleColor, fontSize: 17),
+                ),
+                Container(
+                  height: 37,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(15)),
+                    color: Colors.white,
+                  ),
+                  padding: EdgeInsets.only(left: 10, top: 15),
+                  child: TextFormField(
+                    controller: memberNameTxt,
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: 'Nombre del integrante',
+                        hintStyle: TextStyle(fontSize: 15)),
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  "Descripción",
+                  style: TextStyle(color: purpleColor, fontSize: 17),
+                ),
+                Container(
+                  height: 70,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(15)),
+                    color: Colors.white,
+                  ),
+                  padding: EdgeInsets.only(left: 10),
+                  child: TextFormField(
+                    controller: memberDescriptionTxt,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: 'Descripción del integrante',
+                        hintStyle: TextStyle(fontSize: 15)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        buttons: [
+          DialogButton(
+              child: Text(
+                "Cancelar",
+                style: TextStyle(color: Colors.white, fontSize: 17),
+              ),
+              onPressed: () => Navigator.pop(context),
+              color: Colors.grey[400]),
+          DialogButton(
+            child: Text(
+              "Agregar",
+              style: TextStyle(color: Colors.white, fontSize: 17),
+            ),
+            onPressed: () {
+              if (!memberFieldsEmpty()) {
+                members.add(new SaveMember(
+                    memberNameTxt.text, memberDescriptionTxt.text));
+                setState(() {
+                  memberNameTxt.text = '';
+                  memberDescriptionTxt.text = '';
+                });
+                Navigator.pop(context);
+              } else {
+                _showDialog();
+              }
+            },
+            color: purpleColor,
+          )
+        ]).show();
   }
 
   Future<void> addMemberDialog() async {
@@ -174,188 +272,224 @@ class _AddGroupState extends State<AddGroup> {
             child: Stack(
           children: <Widget>[
             Positioned(
-                child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Crear Grupo',
-                      style: title(),
-                    )
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 34),
-                      child: Text(
-                        'Nombre',
-                        style: subtitle(),
+                child: Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Crear Grupo',
+                        style: title(),
+                      )
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 34),
+                        child: Text(
+                          'Nombre',
+                          style: subtitle(),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    SizedBox(
-                      width: size.width * 0.85,
-                      child: TextField(
-                        controller: groupNameTxt,
-                        style: fields(),
-                        decoration: fieldDecoration(),
-                      ),
-                    )
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 34),
-                      child: Text(
-                        'Descripción',
-                        style: subtitle(),
-                      ),
-                    )
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    SizedBox(
-                      width: size.width * 0.85,
-                      child: TextField(
-                        controller: groupDescriptionTxt,
-                        style: fields(),
-                        decoration: fieldDecoration(),
-                      ),
-                    )
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 34),
-                      child: Text(
-                        'Miembros',
-                        style: subtitle(),
-                      ),
-                    )
-                  ],
-                ),
-                Container(
-                    height: size.height / 7,
+                    ],
+                  ),
+                  Container(
                     width: size.width * 0.85,
-                    //decoration: BoxDecoration(color: Colors.purple[100]),
-                    child: members.isEmpty
-                        ? Text(
-                            'Aún no se han agregado miembros',
-                            style: memberStyle(),
-                          )
-                        : RawScrollbar(
-                            controller: scroll,
-                            isAlwaysShown: true,
-                            thumbColor: scrollColor,
-                            radius: Radius.circular(8),
-                            child: ListView.builder(
-                                itemCount: members.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return Container(
-                                      width: double.infinity,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 10.0),
-                                            child: Text(
-                                              '${members[index].name}',
-                                              textAlign: TextAlign.left,
-                                              style: memberStyle(),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 10.0),
-                                            child: Text(
-                                              '-${members[index].description}',
-                                              textAlign: TextAlign.left,
-                                              style: memberStyle(),
-                                            ),
-                                          )
-                                        ],
-                                      ));
-                                }),
-                          )),
-                Row(
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 34),
-                      child: Text(
-                        'Agregar miembro',
-                        style: addMem(),
-                      ),
+                    height: 37,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      color: Colors.white,
                     ),
-                    FloatingActionButton(
-                      onPressed: () {
-                        addMemberDialog();
-                      },
-                      heroTag: "addMemberBtn",
-                      backgroundColor: Color(0x00000000),
-                      elevation: 0,
-                      child: Icon(
-                        Icons.add_circle,
-                        color: purpleColor,
-                      ),
-                    )
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 34),
-                      child: Text(
-                        'Curso',
-                        style: subtitle(),
-                        textAlign: TextAlign.start,
-                      ),
-                    )
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    SizedBox(
+                    padding: EdgeInsets.only(left: 10, top: 15),
+                    child: TextFormField(
+                      controller: groupNameTxt,
+                      keyboardType: TextInputType.text,
+                      decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Nombre del grupo',
+                          hintStyle: TextStyle(fontSize: 15)),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 34),
+                        child: Text(
+                          'Descripción',
+                          style: subtitle(),
+                        ),
+                      )
+                    ],
+                  ),
+                  Container(
+                    width: size.width * 0.85,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      color: Colors.white,
+                    ),
+                    padding: EdgeInsets.only(left: 10),
+                    child: TextFormField(
+                      controller: groupDescriptionTxt,
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null,
+                      decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Descripción del grupo',
+                          hintStyle: TextStyle(fontSize: 15)),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 34),
+                        child: Text(
+                          'Miembros',
+                          style: subtitle(),
+                        ),
+                      )
+                    ],
+                  ),
+                  Container(
+                      height: size.height / 7,
                       width: size.width * 0.85,
-                      child: Text(
-                        '${widget.courseName}',
-                        style: fields(),
+                      //decoration: BoxDecoration(color: Colors.purple[100]),
+                      child: members.isEmpty
+                          ? Center(
+                              child: Text(
+                                'Aún no se han agregado miembros',
+                                style: memberStyle(),
+                              ),
+                            )
+                          : RawScrollbar(
+                              controller: scroll,
+                              isAlwaysShown: true,
+                              thumbColor: scrollColor,
+                              radius: Radius.circular(8),
+                              child: ListView.builder(
+                                  itemCount: members.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return Container(
+                                        width: double.infinity,
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 10.0),
+                                              child: Text(
+                                                '${members[index].name}',
+                                                textAlign: TextAlign.left,
+                                                style: memberStyle(),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 10.0),
+                                              child: Text(
+                                                '- ${members[index].description}',
+                                                textAlign: TextAlign.left,
+                                                style: memberStyle(),
+                                              ),
+                                            )
+                                          ],
+                                        ));
+                                  }),
+                            )),
+                  Row(
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 34),
+                        child: Text(
+                          'Agregar miembro',
+                          style: subtitle(),
+                        ),
                       ),
-                    )
-                  ],
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 25.0),
-                  child: ElevatedButton(
-                      child: Text('Crear Grupo', style: btnText()),
-                      style: btnStyle(),
-                      onPressed: () {
-                        if (!groupFieldsEmpty()) {
-                          createGroup();
-                          setState(() {
-                            groupNameTxt.text = '';
-                            groupDescriptionTxt.text = '';
-                            members = [];
-                          });
-                        } else {
-                          _showDialog();
-                        }
-                      }),
-                )
-              ],
+                      FloatingActionButton(
+                        onPressed: () {
+                          _addMemberPopPup();
+                        },
+                        heroTag: "addMemberBtn",
+                        backgroundColor: Color(0x00000000),
+                        elevation: 0,
+                        child: Icon(
+                          Icons.add_circle,
+                          color: purpleColor,
+                        ),
+                      )
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 34),
+                        child: Text(
+                          'Curso',
+                          style: subtitle(),
+                          textAlign: TextAlign.start,
+                        ),
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Container(
+                      width: size.width * 0.85,
+                      height: 37,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                        color: Colors.white,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '${widget.courseName}',
+                          style:
+                              TextStyle(fontSize: 15, color: Color(0xff707070)),
+                        ),
+                      )),
+                  Center(
+                    child: Container(
+                        margin: EdgeInsets.only(top: 20),
+                        width: MediaQuery.of(context).size.width * 0.4,
+                        height: 40,
+                        child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              shape: StadiumBorder(),
+                              backgroundColor: Colors.white,
+                              side: BorderSide(
+                                  color: Color(0xff8377D1), width: 1),
+                            ),
+                            onPressed: () {
+                              if (!groupFieldsEmpty()) {
+                                createGroup();
+                                setState(() {
+                                  groupNameTxt.text = '';
+                                  groupDescriptionTxt.text = '';
+                                  members = [];
+                                });
+                              } else {
+                                _showDialog();
+                              }
+                            },
+                            child: Text(
+                              'Crear Grupo',
+                              style: TextStyle(
+                                  color: Color(0xff8377D1),
+                                  fontSize: 15,
+                                  fontStyle: FontStyle.italic),
+                            ))),
+                  ),
+                ],
+              ),
             )),
             Positioned(
                 bottom: 0,
@@ -370,7 +504,7 @@ class _AddGroupState extends State<AddGroup> {
 
 TextStyle title() {
   return TextStyle(
-      fontSize: 28,
+      fontSize: 23,
       color: purpleColor,
       fontStyle: FontStyle.italic,
       fontWeight: FontWeight.bold);
@@ -378,15 +512,16 @@ TextStyle title() {
 
 TextStyle subtitle() {
   return TextStyle(
-      fontSize: 18,
-      color: purpleColor,
-      fontStyle: FontStyle.italic,
-      fontWeight: FontWeight.bold);
+    color: Color(0xff8980D3),
+    fontSize: 16,
+    fontStyle: FontStyle.italic,
+    fontWeight: FontWeight.bold,
+  );
 }
 
 TextStyle memberStyle() {
   return TextStyle(
-    fontSize: 18,
+    fontSize: 15,
     color: purpleColor,
     fontStyle: FontStyle.italic,
   );
