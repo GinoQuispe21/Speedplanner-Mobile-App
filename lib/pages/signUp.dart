@@ -1,12 +1,15 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:speedplanner/models/TokenUserData.dart';
+import 'package:speedplanner/pages/privacyPolicy.dart';
+import 'package:speedplanner/pages/termsOfService.dart';
 import 'package:speedplanner/services/Register.dart';
 //import 'package:speedplanner/pages/home.dart';
 import 'package:speedplanner/utils/colors.dart';
 import 'package:speedplanner/utils/textInput.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:speedplanner/utils/footer.dart';
-import 'package:http/http.dart' as http;
 
 class SignUp extends StatefulWidget {
   @override
@@ -14,6 +17,8 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
+  TapGestureRecognizer _recognizerTermsOfService;
+  TapGestureRecognizer _recognizerPrivacyPolicy;
   RegisterService registerService = new RegisterService();
   TextEditingController fullName = TextEditingController();
   TextEditingController user = TextEditingController();
@@ -26,6 +31,72 @@ class _SignUpState extends State<SignUp> {
   String emailData = '';
   String passwordData = '';
   bool _isHidden = true;
+  bool aceptTOSandPP = false;
+
+  _errorIncompleteData() {
+    Alert(
+        context: context,
+        style: AlertStyle(
+          backgroundColor: Color(0xffF87575),
+          descStyle: TextStyle(color: Colors.white, fontSize: 15),
+          titleStyle: TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25),
+        ),
+        title: "Error",
+        desc: "Ingrese todos los campos solicitados por favor.",
+        buttons: [
+          DialogButton(
+              child: Text(
+                "Aceptar",
+                style: TextStyle(color: Color(0xffF87575), fontSize: 17),
+              ),
+              onPressed: () => Navigator.pop(context),
+              color: Colors.white),
+        ]).show();
+  }
+
+  _errorAceptTOSandPP() {
+    Alert(
+        context: context,
+        style: AlertStyle(
+          backgroundColor: Color(0xffF87575),
+          descStyle: TextStyle(color: Colors.white, fontSize: 15),
+          titleStyle: TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25),
+        ),
+        title: "Error",
+        desc:
+            "Debe aceptar los terminos y condiciones para poder crear su cuenta en Speedplanner.",
+        buttons: [
+          DialogButton(
+              child: Text(
+                "Aceptar",
+                style: TextStyle(color: Color(0xffF87575), fontSize: 17),
+              ),
+              onPressed: () => Navigator.pop(context),
+              color: Colors.white),
+        ]).show();
+  }
+
+  void _validationRegister() async {
+    if (fullName.text == '' ||
+        fullName.text == '' ||
+        email.text == '' ||
+        password.text == '') {
+      print("aaaaaaaaaaaaaaaaaaaa");
+      _errorIncompleteData();
+    } else {
+      if (aceptTOSandPP == false) {
+        print("no acepte");
+        _errorAceptTOSandPP();
+      } else {
+        print("acepte");
+        _register();
+      }
+      //_register();
+    }
+  }
+
   void _register() async {
     TokenUserData tokenUserData = await registerService.register(
         fullName.text, user.text, email.text, password.text);
@@ -69,6 +140,28 @@ class _SignUpState extends State<SignUp> {
           textColor: Colors.white,
           fontSize: 16.0);
     }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _recognizerTermsOfService = TapGestureRecognizer()
+      ..onTap = () {
+        print("terminos de servicio");
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => TermsOfSerivceWidget()),
+        );
+      };
+    _recognizerPrivacyPolicy = TapGestureRecognizer()
+      ..onTap = () {
+        print("politicas de privacidad");
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => PrivacyPolicyWidget()),
+        );
+      };
   }
 
   @override
@@ -154,8 +247,87 @@ class _SignUpState extends State<SignUp> {
                         ),
                       ),
                     ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: Container(
+                        child: Row(
+                          children: [
+                            IconButton(
+                              icon: Icon(aceptTOSandPP
+                                  ? Icons.check_box
+                                  : Icons.check_box_outline_blank),
+                              color: Colors.white,
+                              onPressed: () {
+                                setState(() {
+                                  aceptTOSandPP = !aceptTOSandPP;
+                                });
+                              },
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: <Widget>[
+                                Text('Al registrarte, estás aceptando las ',
+                                    style: TextStyle(
+                                      fontSize: 14.0,
+                                      color: Colors.white,
+                                    )),
+                                RichText(
+                                    text: new TextSpan(
+                                        style: new TextStyle(
+                                          fontSize: 14.0,
+                                          color: Colors.white,
+                                        ),
+                                        children: <TextSpan>[
+                                      new TextSpan(
+                                          text: 'Condiciones de Servicio ',
+                                          style: new TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                          recognizer:
+                                              _recognizerTermsOfService),
+                                      new TextSpan(
+                                        text: 'y las ',
+                                      )
+                                    ])),
+                                RichText(
+                                    text: new TextSpan(
+                                        style: new TextStyle(
+                                          fontSize: 14.0,
+                                          color: Colors.white,
+                                        ),
+                                        children: <TextSpan>[
+                                      new TextSpan(
+                                          text: 'Políticas de Privacidad',
+                                          style: new TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                          recognizer: _recognizerPrivacyPolicy),
+                                    ]))
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                     Container(
-                      margin: EdgeInsets.only(top: 1),
+                        margin: EdgeInsets.only(top: 20),
+                        width: MediaQuery.of(context).size.width * 0.7,
+                        height: 47,
+                        child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              shape: StadiumBorder(),
+                              side: BorderSide(color: Colors.white, width: 1),
+                            ),
+                            onPressed: () {
+                              //getValues();
+                              //_register();
+                              _validationRegister();
+                            },
+                            child: Text(
+                              'Registrarse',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 18),
+                            ))),
+                    Container(
+                      margin: EdgeInsets.only(top: 30),
                       child: TextButton(
                         onPressed: () {
                           Navigator.pushNamed(context, '/signin');
@@ -168,24 +340,6 @@ class _SignUpState extends State<SignUp> {
                                 fontStyle: FontStyle.italic)),
                       ),
                     ),
-                    Container(
-                        margin: EdgeInsets.only(top: 30),
-                        width: MediaQuery.of(context).size.width * 0.7,
-                        height: 47,
-                        child: OutlinedButton(
-                            style: OutlinedButton.styleFrom(
-                              shape: StadiumBorder(),
-                              side: BorderSide(color: Colors.white, width: 1),
-                            ),
-                            onPressed: () {
-                              //getValues();
-                              _register();
-                            },
-                            child: Text(
-                              'Registrarse',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 18),
-                            )))
                   ],
                 ),
               ),
