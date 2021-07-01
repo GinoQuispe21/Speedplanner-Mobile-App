@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:speedplanner/models/TimedTask.dart';
 import 'package:speedplanner/models/SimpleTask.dart';
 import 'package:speedplanner/models/StudyGroup.dart';
 import 'package:speedplanner/services/CreateSimpleTask.dart';
+import 'package:speedplanner/services/CreateTimedTask.dart';
 import 'package:speedplanner/utils/AppBar.dart';
 import 'package:speedplanner/utils/colors.dart';
 import 'package:speedplanner/utils/dateFooter.dart';
@@ -31,6 +34,7 @@ class CreateSimpleTask extends StatefulWidget {
 class _CreateSimpleTaskState extends State<CreateSimpleTask> {
   CreateSimpleTaskService createSimpleTaskService =
       new CreateSimpleTaskService();
+  CreateTimedTaskService createTimedTaskService = new CreateTimedTaskService();
   String formatter = '';
   List<StudyGroup> listGroups = [];
   int selectedRadioTile;
@@ -38,26 +42,188 @@ class _CreateSimpleTaskState extends State<CreateSimpleTask> {
   TextEditingController descriptionTask = TextEditingController();
   String deadline = '';
   bool finished = false;
+  bool isTimedTask = false;
+  bool sure = false;
   String timeAux;
 
-  DateTime selectedDate = DateTime.now();
-  final DateFormat dateFormat = DateFormat('yyyy-MM-dd HH:mm');
+  DateTime selectedDateStart = DateTime.now();
+  final DateFormat dateFormatStart = DateFormat('yyyy-MM-dd HH:mm');
+
+  DateTime selectedDateEnd = DateTime.now();
+  final DateFormat dateFormatEnd = DateFormat('yyyy-MM-dd HH:mm');
+
+  _openPopUpError(context) {
+    Alert(
+        context: context,
+        style: AlertStyle(
+          backgroundColor: Color(0xffF87575),
+          descStyle: TextStyle(color: Colors.white, fontSize: 15),
+          titleStyle: TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25),
+        ),
+        title: "Error",
+        desc:
+            "No se pudo crear la tarea, verifique que haya completado todos los campos",
+        buttons: [
+          DialogButton(
+              child: Text(
+                "Aceptar",
+                style: TextStyle(color: Color(0xffF87575), fontSize: 17),
+              ),
+              onPressed: () => Navigator.pop(context),
+              color: Colors.white),
+        ]).show();
+  }
+
+  _openPopUpAreYouSure(context) {
+    Alert(
+        context: context,
+        style: AlertStyle(
+          backgroundColor: backgroundColor,
+          descStyle: TextStyle(color: Color(0xff707070), fontSize: 15),
+          titleStyle: TextStyle(
+              color: purpleColor, fontWeight: FontWeight.bold, fontSize: 25),
+        ),
+        title: "Confirmación",
+        desc: "Esta registrando la tarea:",
+        content: Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: Container(
+            width: 300,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  "Titulo de la Tarea: ",
+                  style: TextStyle(fontSize: 15, color: Color(0xff707070)),
+                ),
+                Text(
+                  '${titleTask.text}',
+                  style: TextStyle(fontSize: 15, color: Color(0xff707070)),
+                ),
+                Divider(
+                  height: 20.0,
+                  thickness: 1.5,
+                  color: Color(0Xff707070),
+                ),
+                Text(
+                  "Descripción de la Tarea: ",
+                  style: TextStyle(fontSize: 15, color: Color(0xff707070)),
+                ),
+                Text(
+                  '${descriptionTask.text}',
+                  style: TextStyle(fontSize: 15, color: Color(0xff707070)),
+                ),
+                Divider(
+                  height: 20.0,
+                  thickness: 1.5,
+                  color: Color(0Xff707070),
+                ),
+                Row(
+                  children: <Widget>[
+                    Text("Inicio: ",
+                        style:
+                            TextStyle(fontSize: 15, color: Color(0xff707070))),
+                    Text(dateFormatStart.format(selectedDateStart),
+                        style:
+                            TextStyle(fontSize: 15, color: Color(0xff707070)))
+                  ],
+                ),
+                Container(
+                  child: isTimedTask
+                      ? Divider(
+                          height: 20.0,
+                          thickness: 1.5,
+                          color: Color(0Xff707070),
+                        )
+                      : null,
+                ),
+                Container(
+                  child: isTimedTask
+                      ? Row(
+                          children: <Widget>[
+                            Text("Final: ",
+                                style: TextStyle(
+                                    fontSize: 15, color: Color(0xff707070))),
+                            Text(dateFormatEnd.format(selectedDateEnd),
+                                style: TextStyle(
+                                    fontSize: 15, color: Color(0xff707070)))
+                          ],
+                        )
+                      : null,
+                ),
+              ],
+            ),
+          ),
+        ),
+        buttons: [
+          DialogButton(
+              child: Text(
+                "Cancelar",
+                style: TextStyle(color: Colors.white, fontSize: 17),
+              ),
+              onPressed: () => Navigator.pop(context),
+              color: Colors.grey[400]),
+          DialogButton(
+            child: Text(
+              "Aceptar",
+              style: TextStyle(color: Colors.white, fontSize: 17),
+            ),
+            onPressed: () {
+              if (isTimedTask == false) {
+                print("ACA SE VA A CREAR UNA TAREA SIMPLE");
+                _createSimpleTask();
+              }
+              if (isTimedTask == true) {
+                print("ACA SE VA A CREAR UNA TAREA CRONOMETRADA");
+                _createTimedTasks();
+              }
+            },
+            color: purpleColor,
+          )
+        ]).show();
+  }
+
+  void createTask() {
+    if (titleTask.text == '' ||
+        descriptionTask.text == '' ||
+        selectedRadioTile == null) {
+      _openPopUpError(context);
+    } else {
+      _openPopUpAreYouSure(context);
+    }
+  }
 
   void _createSimpleTask() async {
-    if (titleTask.text != '' &&
-        descriptionTask.text != '' &&
-        selectedRadioTile != null) {
-      var aux = selectedDate.toString();
-      String date = aux.substring(0, 16);
-      TestSimpleTask simpleTask =
-          await createSimpleTaskService.createSimpleTask(selectedRadioTile,
-              widget.token, titleTask.text, descriptionTask.text, date, false);
+    var aux = selectedDateStart.toString();
+    String date = aux.substring(0, 16);
+    TestSimpleTask simpleTask = await createSimpleTaskService.createSimpleTask(
+        selectedRadioTile,
+        widget.token,
+        titleTask.text,
+        descriptionTask.text,
+        date,
+        false);
 
-      print("TAREA CREADA DE VERDAD");
-      print(simpleTask.title);
-    } else {
-      print("ERROR");
-    }
+    print("TAREA CREADA DE VERDAD");
+    print(simpleTask.title);
+  }
+
+  void _createTimedTasks() async {
+    var aux1 = selectedDateStart.toString();
+    String dateStart = aux1.substring(0, 16);
+    var aux2 = selectedDateStart.toString();
+    String dateEnd = aux2.substring(0, 16);
+    TestTimedTask testTimedTask = await createTimedTaskService.createTimedTask(
+        selectedRadioTile,
+        widget.token,
+        titleTask.text,
+        descriptionTask.text,
+        dateStart,
+        dateEnd,
+        finished);
+    print("TAREA CREADA DE VERDAD");
+    print(testTimedTask.title);
   }
 
   void getCurrentDate() async {
@@ -100,7 +266,7 @@ class _CreateSimpleTaskState extends State<CreateSimpleTask> {
               alignment: Alignment.center,
               children: <Widget>[
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
+                  padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 60.0),
                   child: Container(
                     //decoration: BoxDecoration(color: Color(0xffC7C1EB)),
                     width: size.width,
@@ -109,7 +275,7 @@ class _CreateSimpleTaskState extends State<CreateSimpleTask> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Center(
-                          child: Text("Nueva Tarea Simple",
+                          child: Text("Nueva Tarea",
                               style: TextStyle(
                                 color: Color(0xff8980D3),
                                 fontSize: 23,
@@ -166,8 +332,24 @@ class _CreateSimpleTaskState extends State<CreateSimpleTask> {
                                 hintStyle: TextStyle(fontSize: 15)),
                           ),
                         ),
-                        SizedBox(height: 7),
-                        Text('Deadline',
+                        SizedBox(height: 5),
+                        Row(
+                          children: <Widget>[
+                            IconButton(
+                              color: Color(0xff707070),
+                              icon: Icon(isTimedTask
+                                  ? Icons.check_box
+                                  : Icons.check_box_outline_blank_outlined),
+                              onPressed: () {
+                                setState(() {
+                                  isTimedTask = !isTimedTask;
+                                });
+                              },
+                            ),
+                            Text("Asignar hora limite a la tarea")
+                          ],
+                        ),
+                        Text('Inicio',
                             style: TextStyle(
                               color: Color(0xff8980D3),
                               fontSize: 15,
@@ -183,10 +365,10 @@ class _CreateSimpleTaskState extends State<CreateSimpleTask> {
                                   label: Text("Fecha y Hora"),
                                   onPressed: () async {
                                     showDateTimeDialog(context,
-                                        initialDate: selectedDate,
+                                        initialDate: selectedDateStart,
                                         onSelectedDate: (selectedDate) {
                                       setState(() {
-                                        this.selectedDate = selectedDate;
+                                        this.selectedDateStart = selectedDate;
                                         print(
                                             'LA HORA ES:  ${selectedDate.toString()}');
                                       });
@@ -222,7 +404,8 @@ class _CreateSimpleTaskState extends State<CreateSimpleTask> {
                                             right: 13,
                                             left: 13),
                                         child: Text(
-                                          dateFormat.format(selectedDate),
+                                          dateFormatStart
+                                              .format(selectedDateStart),
                                           style: TextStyle(
                                               color: Color(0xff737373),
                                               fontSize: 14),
@@ -233,7 +416,93 @@ class _CreateSimpleTaskState extends State<CreateSimpleTask> {
                           ],
                         ),
                         SizedBox(height: 3),
-                        Text('Seleccionar grupo',
+                        Container(
+                          child: isTimedTask
+                              ? Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text('Final',
+                                        style: TextStyle(
+                                          color: Color(0xff8980D3),
+                                          fontSize: 15,
+                                          fontStyle: FontStyle.italic,
+                                          fontWeight: FontWeight.bold,
+                                        )),
+                                    Row(
+                                      children: <Widget>[
+                                        Expanded(
+                                          child: Container(
+                                            child: ElevatedButton.icon(
+                                              label: Text("Fecha y Hora"),
+                                              onPressed: () async {
+                                                showDateTimeDialog(context,
+                                                    initialDate:
+                                                        selectedDateEnd,
+                                                    onSelectedDate:
+                                                        (selectedDate) {
+                                                  setState(() {
+                                                    this.selectedDateEnd =
+                                                        selectedDate;
+                                                    print(
+                                                        'LA HORA ES:  ${selectedDate.toString()}');
+                                                  });
+                                                });
+                                              },
+                                              icon: Icon(Icons
+                                                  .calendar_today_outlined),
+                                              style: ElevatedButton.styleFrom(
+                                                  primary: purpleColor,
+                                                  shape: StadiumBorder(),
+                                                  side: BorderSide(
+                                                      color: Colors.white,
+                                                      width: 2),
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 5,
+                                                      vertical: 7),
+                                                  textStyle: TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.bold)),
+                                            ),
+                                          ),
+                                          flex: 4,
+                                        ),
+                                        Expanded(
+                                          child: Center(
+                                              child: Container(
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                15)),
+                                                    color: Colors.white,
+                                                  ),
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 10,
+                                                            bottom: 10,
+                                                            right: 13,
+                                                            left: 13),
+                                                    child: Text(
+                                                      dateFormatEnd.format(
+                                                          selectedDateEnd),
+                                                      style: TextStyle(
+                                                          color:
+                                                              Color(0xff737373),
+                                                          fontSize: 14),
+                                                    ),
+                                                  ))),
+                                          flex: 5,
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                )
+                              : null,
+                        ),
+                        Text('Grupo',
                             style: TextStyle(
                               color: Color(0xff8980D3),
                               fontSize: 15,
@@ -245,7 +514,7 @@ class _CreateSimpleTaskState extends State<CreateSimpleTask> {
                           children: <Widget>[
                             Expanded(
                               child: Container(
-                                height: 130,
+                                height: 40.0 * listGroups.length,
                                 child: ListView.builder(
                                     itemCount: listGroups.length,
                                     itemBuilder:
@@ -340,7 +609,8 @@ class _CreateSimpleTaskState extends State<CreateSimpleTask> {
                                         color: Color(0xff8377D1), width: 1),
                                   ),
                                   onPressed: () {
-                                    _createSimpleTask();
+                                    //_createSimpleTask();
+                                    createTask();
                                   },
                                   child: Text(
                                     'Crear Tarea',

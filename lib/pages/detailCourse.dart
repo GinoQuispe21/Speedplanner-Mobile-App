@@ -592,7 +592,16 @@ class _DetailCourseState extends State<DetailCourse> {
                       backgroundColor: Color(0x00000000),
                       elevation: 0,
                       onPressed: () {
-                        _openPopup(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CreateSimpleTask(
+                                      token: widget.token,
+                                      username: widget.username,
+                                      listGroup: listGroup,
+                                      courseId: widget.course.id,
+                                      courseName: widget.course.name,
+                                    )));
                       },
                       child: const Icon(
                         Icons.add_circle_outline_sharp,
