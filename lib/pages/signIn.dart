@@ -150,7 +150,9 @@ class _SignInState extends State<SignIn> {
                     Container(
                         margin: EdgeInsets.only(top: 20),
                         child: TextButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/newpassword');
+                            },
                             child: Text(
                               'Se me olvidó mi contraseña',
                               style: TextStyle(

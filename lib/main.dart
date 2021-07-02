@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:speedplanner/pages/addCourse.dart';
 import 'package:speedplanner/pages/firstScreen.dart';
 import 'package:speedplanner/pages/home.dart';
+import 'package:speedplanner/pages/newPassword.dart';
 import 'package:speedplanner/pages/signIn.dart';
 import 'package:speedplanner/pages/signUp.dart';
 import 'package:speedplanner/pages/taskDetails.dart';
@@ -16,6 +17,7 @@ void main() {
       '/': (context) => FirstScreen(),
       '/signin': (context) => SignIn(),
       '/signup': (context) => SignUp(),
+      '/newpassword': (context) => NewPassword(),
       '/addCourse': (context) => AddCourse(),
       '/taskCourse': (context) => TaskDetails(),
     },
