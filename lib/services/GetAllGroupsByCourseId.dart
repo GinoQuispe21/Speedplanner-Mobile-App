@@ -27,7 +27,6 @@ class GroupsService {
                   'https://speedplanner-mobile.herokuapp.com/api/studyGroups/$groupId/simpleTasks'),
               headers: {HttpHeaders.authorizationHeader: token});
           if (responseSimpleTask.statusCode == 200) {
-            print('ESTE ES EL ID DE MIERDA DEL GRUPO QUE QUIERO VER $groupId');
             Map dataSimpleTask =
                 jsonDecode(utf8.decode(responseSimpleTask.bodyBytes));
             for (int j = 0; j < dataSimpleTask['content'].length; j++) {

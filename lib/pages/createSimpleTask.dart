@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:speedplanner/models/TimedTask.dart';
@@ -173,10 +174,12 @@ class _CreateSimpleTaskState extends State<CreateSimpleTask> {
               if (isTimedTask == false) {
                 print("ACA SE VA A CREAR UNA TAREA SIMPLE");
                 _createSimpleTask();
+                Navigator.pop(context);
               }
               if (isTimedTask == true) {
                 print("ACA SE VA A CREAR UNA TAREA CRONOMETRADA");
                 _createTimedTasks();
+                Navigator.pop(context);
               }
             },
             color: purpleColor,
@@ -204,8 +207,15 @@ class _CreateSimpleTaskState extends State<CreateSimpleTask> {
         descriptionTask.text,
         date,
         false);
-
     print("TAREA CREADA DE VERDAD");
+    Fluttertoast.showToast(
+        msg: "Tarea creada",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Color(0xff30B18B),
+        textColor: Colors.white,
+        fontSize: 16.0);
     print(simpleTask.title);
   }
 
@@ -223,6 +233,14 @@ class _CreateSimpleTaskState extends State<CreateSimpleTask> {
         dateEnd,
         finished);
     print("TAREA CREADA DE VERDAD");
+    Fluttertoast.showToast(
+        msg: "Tarea creada",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Color(0xff30B18B),
+        textColor: Colors.white,
+        fontSize: 16.0);
     print(testTimedTask.title);
   }
 

@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:speedplanner/models/Course.dart';
 import 'package:speedplanner/models/ListTask.dart';
 import 'package:speedplanner/models/SimpleTask.dart';
-import 'package:speedplanner/models/SimpleTaskUpdateModel.dart';
 import 'package:speedplanner/models/StudyGroup.dart';
 import 'package:speedplanner/models/TimedTask.dart';
-import 'package:speedplanner/models/TimedTaskUpdateModel.dart';
 import 'package:speedplanner/pages/createSimpleTask.dart';
 import 'package:speedplanner/services/DeleteUpdateCourse.dart';
 import 'package:speedplanner/services/GetAllGroupsByCourseId.dart';
@@ -99,8 +98,8 @@ class _DetailCourseState extends State<DetailCourse> {
         fin = getTimedTaskService.timedTaskUpdateModel.fin;
         title = getTimedTaskService.timedTaskUpdateModel.title;
         description = getTimedTaskService.timedTaskUpdateModel.description;
-        updateTimedTask(studyGroupId, taskId, token, finishedChanged.toString(), inicio, fin,
-            title, description);
+        updateTimedTask(studyGroupId, taskId, token, finishedChanged.toString(),
+            inicio, fin, title, description);
       }
     }
   }
@@ -246,6 +245,15 @@ class _DetailCourseState extends State<DetailCourse> {
                   getTimedTaskEndController.text,
                   getTimedTaskNameController.text,
                   getTimedTaskDescriptionController.text);
+              Navigator.pop(context);
+              Fluttertoast.showToast(
+                  msg: "Tarea actualizada",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Color(0xff30B18B),
+                  textColor: Colors.white,
+                  fontSize: 16.0);
             },
             color: purpleColor,
           )
@@ -327,6 +335,15 @@ class _DetailCourseState extends State<DetailCourse> {
                   getTaskDeadlineController.text,
                   getTaskNameController.text,
                   getTaskDescriptionController.text);
+              Navigator.pop(context);
+              Fluttertoast.showToast(
+                  msg: "Tarea actualizada",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Color(0xff30B18B),
+                  textColor: Colors.white,
+                  fontSize: 16.0);
             },
             color: purpleColor,
           )
@@ -361,6 +378,15 @@ class _DetailCourseState extends State<DetailCourse> {
             ),
             onPressed: () {
               deleteTask(studyGroupId, typeTask, taskId, widget.token);
+              Navigator.pop(context);
+              Fluttertoast.showToast(
+                  msg: "Tarea eliminada",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Color(0xff30B18B),
+                  textColor: Colors.white,
+                  fontSize: 16.0);
             },
             color: Color(0xffF87575),
           )
@@ -395,6 +421,7 @@ class _DetailCourseState extends State<DetailCourse> {
             ),
             onPressed: () {
               deleteCourses();
+              Navigator.pop(context);
             },
             color: Color(0xffF87575),
           )
