@@ -212,7 +212,7 @@ class _CreateSimpleTaskState extends State<CreateSimpleTask> {
   void _createTimedTasks() async {
     var aux1 = selectedDateStart.toString();
     String dateStart = aux1.substring(0, 16);
-    var aux2 = selectedDateStart.toString();
+    var aux2 = selectedDateEnd.toString();
     String dateEnd = aux2.substring(0, 16);
     TestTimedTask testTimedTask = await createTimedTaskService.createTimedTask(
         selectedRadioTile,

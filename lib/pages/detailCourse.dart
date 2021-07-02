@@ -4,13 +4,15 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:speedplanner/models/Course.dart';
 import 'package:speedplanner/models/ListTask.dart';
 import 'package:speedplanner/models/SimpleTask.dart';
+import 'package:speedplanner/models/SimpleTaskUpdateModel.dart';
 import 'package:speedplanner/models/StudyGroup.dart';
 import 'package:speedplanner/models/TimedTask.dart';
+import 'package:speedplanner/models/TimedTaskUpdateModel.dart';
 import 'package:speedplanner/pages/createSimpleTask.dart';
-import 'package:speedplanner/pages/createTimedTask.dart';
 import 'package:speedplanner/services/DeleteUpdateCourse.dart';
 import 'package:speedplanner/services/GetAllGroupsByCourseId.dart';
 import 'package:speedplanner/services/GetSimpleTaskById.dart';
+import 'package:speedplanner/services/UpdateDeleteTask.dart';
 import 'package:speedplanner/utils/AppBar.dart';
 import 'package:speedplanner/utils/colors.dart';
 import 'package:speedplanner/utils/dateFooter.dart';
@@ -38,77 +40,331 @@ class _DetailCourseState extends State<DetailCourse> {
   DeleteCourse deleteCourse = new DeleteCourse();
   UpdateCourse updateCourse = new UpdateCourse();
   GroupsService groupsService = new GroupsService();
+  DeleteTaskService deleteTaskService = new DeleteTaskService();
   SimpleTaskService simpleTaskService = new SimpleTaskService();
   TextEditingController courseNameEditController = TextEditingController();
   TextEditingController courseDescriptionEditController =
       TextEditingController();
   TextEditingController courseEmailEditController = TextEditingController();
 
-  _openPopup(context) {
+  TextEditingController getTaskNameController = TextEditingController();
+  TextEditingController getTaskDescriptionController = TextEditingController();
+  TextEditingController getTaskDeadlineController = TextEditingController();
+  TextEditingController getTaskFinishedController = TextEditingController();
+
+  TextEditingController getTimedTaskNameController = TextEditingController();
+  TextEditingController getTimedTaskDescriptionController =
+      TextEditingController();
+  TextEditingController getTimedTaskStartController = TextEditingController();
+  TextEditingController getTimedTaskEndController = TextEditingController();
+  TextEditingController getTimedTaskFinishedController =
+      TextEditingController();
+
+  GetSimpleTaskService getSimpleTaskService = new GetSimpleTaskService();
+  //SimpleTaskUpdateModel simpleTaskUpdateModel;
+
+  GetTimedTaskService getTimedTaskService = new GetTimedTaskService();
+  //TimedTaskUpdateModel timedTaskUpdateModel;
+
+  UpdateSimpleTaskService updateSimpleTaskService =
+      new UpdateSimpleTaskService();
+
+  UpdateTimedTaskService updateTimedTaskService = new UpdateTimedTaskService();
+
+  void updateFinishedTask(studyGroupId, taskId, type, token) async {
+    if (type == "(TS)") {
+      await getSimpleTaskService.getSimpleTaskByStudyGroupId(
+          studyGroupId, taskId, token);
+      bool finishedChanged;
+      String deadline;
+      String title;
+      String description;
+      finishedChanged = !getSimpleTaskService.simpleTaskUpdateModel.finished;
+      deadline = getSimpleTaskService.simpleTaskUpdateModel.deadline;
+      title = getSimpleTaskService.simpleTaskUpdateModel.title;
+      description = getSimpleTaskService.simpleTaskUpdateModel.description;
+      updateSimpleTask(studyGroupId, taskId, token, finishedChanged.toString(),
+          deadline, title, description);
+    } else {
+      if (type == "(TC)") {
+        await getTimedTaskService.getTimedTaskByStudyGroupId(
+            studyGroupId, taskId, token);
+        bool finishedChanged;
+        String inicio;
+        String fin;
+        String title;
+        String description;
+        finishedChanged = !getTimedTaskService.timedTaskUpdateModel.finished;
+        inicio = getTimedTaskService.timedTaskUpdateModel.inicio;
+        fin = getTimedTaskService.timedTaskUpdateModel.fin;
+        title = getTimedTaskService.timedTaskUpdateModel.title;
+        description = getTimedTaskService.timedTaskUpdateModel.description;
+        updateTimedTask(studyGroupId, taskId, token, finishedChanged.toString(), inicio, fin,
+            title, description);
+      }
+    }
+  }
+
+  void updateSimpleTask(studyGroupId, taskId, token, finished, deadline, title,
+      description) async {
+    updateSimpleTaskService.updateSimpleTaskByStudyGroupId(
+        studyGroupId, taskId, token, finished, deadline, title, description);
+    //await ;
+  }
+
+  void updateTimedTask(studyGroupId, taskId, token, finished, inicio, fin,
+      title, description) async {
+    updateTimedTaskService.updateTimedTaskByStudyGroupId(
+        studyGroupId, taskId, token, finished, inicio, fin, title, description);
+  }
+
+  void deleteTask(studyGroupId, typeTask, taskId, token) async {
+    await deleteTaskService.deleteTaskByStudyGroupId(
+        studyGroupId, typeTask, taskId, token);
+  }
+
+  void getSimpleTask(studyGroupId, typeTask, taskId, token, context) async {
+    if (typeTask == "(TS)") {
+      await getSimpleTaskService.getSimpleTaskByStudyGroupId(
+          studyGroupId, taskId, token);
+      getTaskNameController.text =
+          getSimpleTaskService.simpleTaskUpdateModel.title;
+      getTaskDescriptionController.text =
+          getSimpleTaskService.simpleTaskUpdateModel.description;
+      getTaskDeadlineController.text =
+          getSimpleTaskService.simpleTaskUpdateModel.deadline;
+      getTaskFinishedController.text =
+          getSimpleTaskService.simpleTaskUpdateModel.finished.toString();
+      bool finishedSimpleTask;
+      finishedSimpleTask = getSimpleTaskService.simpleTaskUpdateModel.finished;
+
+      _openPopupSimpleEditTask(
+          context, studyGroupId, taskId, token, finishedSimpleTask);
+    } else {
+      if (typeTask == "(TC)") {
+        await getTimedTaskService.getTimedTaskByStudyGroupId(
+            studyGroupId, taskId, token);
+        getTimedTaskNameController.text =
+            getTimedTaskService.timedTaskUpdateModel.title;
+        getTimedTaskDescriptionController.text =
+            getTimedTaskService.timedTaskUpdateModel.description;
+        getTimedTaskStartController.text =
+            getTimedTaskService.timedTaskUpdateModel.inicio;
+        getTimedTaskEndController.text =
+            getTimedTaskService.timedTaskUpdateModel.fin;
+        bool finished;
+        finished = getTimedTaskService.timedTaskUpdateModel.finished;
+        _openPopupTimedEditTask(context, studyGroupId, taskId, token, finished);
+      }
+    }
+  }
+
+  _openPopupTimedEditTask(
+      context, studyGroupId, taskId, token, finishedTimedTask) {
+    Alert(
+        style: AlertStyle(
+          backgroundColor: backgroundColor,
+          descStyle: TextStyle(color: greenColor, fontSize: 15),
+          titleStyle: TextStyle(
+              color: greenColor, fontWeight: FontWeight.bold, fontSize: 25),
+        ),
+        context: context,
+        title: "Editar Curso",
+        content: Container(
+            width: 300,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text("Nombre", style: TextStyle(fontSize: 14)),
+                Container(
+                  height: 30,
+                  child: TextField(
+                    controller: getTimedTaskNameController,
+                    decoration: InputDecoration(),
+                    style: TextStyle(fontSize: 15.0, color: Colors.black),
+                    onChanged: (text) {},
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text("Descripción", style: TextStyle(fontSize: 14)),
+                Container(
+                  height: 70,
+                  child: TextField(
+                    controller: getTimedTaskDescriptionController,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    style: TextStyle(fontSize: 15.0, color: Colors.black),
+                    decoration: InputDecoration(),
+                    onChanged: (text) {},
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text("Inicio", style: TextStyle(fontSize: 14)),
+                Container(
+                  height: 30,
+                  child: TextField(
+                    controller: getTimedTaskStartController,
+                    decoration: InputDecoration(),
+                    style: TextStyle(fontSize: 15.0, color: Colors.black),
+                    onChanged: (text) {},
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text("Fin", style: TextStyle(fontSize: 14)),
+                Container(
+                  height: 30,
+                  child: TextField(
+                    controller: getTimedTaskEndController,
+                    decoration: InputDecoration(),
+                    style: TextStyle(fontSize: 15.0, color: Colors.black),
+                    onChanged: (text) {},
+                  ),
+                ),
+              ],
+            )),
+        buttons: [
+          DialogButton(
+              child: Text(
+                "Cancelar",
+                style: TextStyle(color: Colors.white, fontSize: 17),
+              ),
+              onPressed: () => Navigator.pop(context),
+              color: Colors.grey[400]),
+          DialogButton(
+            child: Text(
+              "Editar",
+              style: TextStyle(color: Colors.white, fontSize: 17),
+            ),
+            onPressed: () {
+              updateTimedTask(
+                  studyGroupId,
+                  taskId,
+                  token,
+                  finishedTimedTask.toString(),
+                  getTimedTaskStartController.text,
+                  getTimedTaskEndController.text,
+                  getTimedTaskNameController.text,
+                  getTimedTaskDescriptionController.text);
+            },
+            color: purpleColor,
+          )
+        ]).show();
+  }
+
+  _openPopupSimpleEditTask(
+      context, studyGroupId, taskId, token, finishedSimpleTask) {
+    Alert(
+        style: AlertStyle(
+          backgroundColor: backgroundColor,
+          descStyle: TextStyle(color: greenColor, fontSize: 15),
+          titleStyle: TextStyle(
+              color: greenColor, fontWeight: FontWeight.bold, fontSize: 25),
+        ),
+        context: context,
+        title: "Editar Curso",
+        content: Container(
+            width: 300,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text("Nombre", style: TextStyle(fontSize: 14)),
+                Container(
+                  height: 30,
+                  child: TextField(
+                    controller: getTaskNameController,
+                    decoration: InputDecoration(),
+                    style: TextStyle(fontSize: 15.0, color: Colors.black),
+                    onChanged: (text) {},
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text("Descripción", style: TextStyle(fontSize: 14)),
+                Container(
+                  height: 70,
+                  child: TextField(
+                    controller: getTaskDescriptionController,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    style: TextStyle(fontSize: 15.0, color: Colors.black),
+                    decoration: InputDecoration(),
+                    onChanged: (text) {},
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text("Inicio", style: TextStyle(fontSize: 14)),
+                Container(
+                  height: 30,
+                  child: TextField(
+                    controller: getTaskDeadlineController,
+                    decoration: InputDecoration(),
+                    style: TextStyle(fontSize: 15.0, color: Colors.black),
+                    onChanged: (text) {},
+                  ),
+                ),
+              ],
+            )),
+        buttons: [
+          DialogButton(
+              child: Text(
+                "Cancelar",
+                style: TextStyle(color: Colors.white, fontSize: 17),
+              ),
+              onPressed: () => Navigator.pop(context),
+              color: Colors.grey[400]),
+          DialogButton(
+            child: Text(
+              "Editar",
+              style: TextStyle(color: Colors.white, fontSize: 17),
+            ),
+            onPressed: () {
+              updateSimpleTask(
+                  studyGroupId,
+                  taskId,
+                  token,
+                  finishedSimpleTask.toString(),
+                  getTaskDeadlineController.text,
+                  getTaskNameController.text,
+                  getTaskDescriptionController.text);
+            },
+            color: purpleColor,
+          )
+        ]).show();
+  }
+
+  _openPopupDeleteTask(context, studyGroupId, typeTask, taskId) {
     Alert(
         context: context,
         style: AlertStyle(
-          backgroundColor: Color(0xffE9EBF8),
+          backgroundColor: backgroundColor,
+          descStyle: TextStyle(color: Color(0xff9C9DA6), fontSize: 15),
+          titleStyle: TextStyle(
+              color: Color(0xffF87575),
+              fontWeight: FontWeight.bold,
+              fontSize: 25),
         ),
-        title: "Tipo de Tarea",
-        content: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            ElevatedButton.icon(
-              icon: Icon(
-                Icons.adjust,
-                color: purpleColor,
-                size: 24.0,
+        title: "Eliminar Tarea",
+        desc: "¿Estás seguro? Esta acción sera permanente!",
+        buttons: [
+          DialogButton(
+              child: Text(
+                "Cancelar",
+                style: TextStyle(color: Colors.white, fontSize: 17),
               ),
-              label: Text(
-                'Crear Tarea Simple',
-                style: TextStyle(color: Colors.black),
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => CreateSimpleTask(
-                              token: widget.token,
-                              username: widget.username,
-                              listGroup: listGroup,
-                              courseId: widget.course.id,
-                              courseName: widget.course.name,
-                            )));
-              },
-              style: ElevatedButton.styleFrom(
-                  primary: Color(0x00000000), shadowColor: Color(0x000000)),
+              onPressed: () => Navigator.pop(context),
+              color: Colors.grey[400]),
+          DialogButton(
+            child: Text(
+              "Eliminar",
+              style: TextStyle(color: Colors.white, fontSize: 17),
             ),
-            ElevatedButton.icon(
-              icon: Icon(
-                Icons.adjust,
-                color: greenColor,
-                size: 24.0,
-              ),
-              label: Text(
-                'Crear Tarea Cronometrada',
-                style: TextStyle(color: Colors.black),
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => CreateTimedTask(
-                              token: widget.token,
-                              username: widget.username,
-                              listGroup: listGroup,
-                              courseId: widget.course.id,
-                              courseName: widget.course.name,
-                            )));
-              },
-              style: ElevatedButton.styleFrom(
-                  primary: Color(0x00000000), shadowColor: Color(0x000000)),
-            ),
-          ],
-        ),
-        buttons: []).show();
+            onPressed: () {
+              deleteTask(studyGroupId, typeTask, taskId, widget.token);
+            },
+            color: Color(0xffF87575),
+          )
+        ]).show();
   }
 
   _openPopupDeleteCourse(context) {
@@ -522,6 +778,14 @@ class _DetailCourseState extends State<DetailCourse> {
                                                     //.check_box_outline_blank,
                                                     //Icons.check_box,
                                                     onPressed: () {
+                                                      updateFinishedTask(
+                                                          listAllTasks[index]
+                                                              .studyGroupId,
+                                                          listAllTasks[index]
+                                                              .id,
+                                                          listAllTasks[index]
+                                                              .type,
+                                                          widget.token);
                                                       setState(() {
                                                         listAllTasks[index]
                                                                 .finished =
@@ -539,10 +803,19 @@ class _DetailCourseState extends State<DetailCourse> {
                                                       const EdgeInsets.only(
                                                           left: 20, right: 20),
                                                   child: Text(
-                                                    "${listAllTasks[index].title} ${listAllTasks[index].type}",
-                                                    style:
-                                                        TextStyle(fontSize: 12),
-                                                  ),
+                                                      "${listAllTasks[index].title} ${listAllTasks[index].type}",
+                                                      style: listAllTasks[index]
+                                                              .finished
+                                                          ? TextStyle(
+                                                              fontSize: 12,
+                                                              decoration:
+                                                                  TextDecoration
+                                                                      .lineThrough,
+                                                              fontStyle:
+                                                                  FontStyle
+                                                                      .italic)
+                                                          : TextStyle(
+                                                              fontSize: 12)),
                                                 ),
                                                 Container(
                                                   height: 25,
@@ -555,7 +828,40 @@ class _DetailCourseState extends State<DetailCourse> {
                                                         Icons.edit_sharp,
                                                         size: 20,
                                                       ),
-                                                      onPressed: () {}),
+                                                      onPressed: () {
+                                                        getSimpleTask(
+                                                            listAllTasks[index]
+                                                                .studyGroupId,
+                                                            listAllTasks[index]
+                                                                .type,
+                                                            listAllTasks[index]
+                                                                .id,
+                                                            widget.token,
+                                                            context);
+                                                      }),
+                                                ),
+                                                Container(
+                                                  height: 25,
+                                                  width: 25,
+                                                  child: IconButton(
+                                                      padding:
+                                                          new EdgeInsets.all(
+                                                              0.0),
+                                                      icon: Icon(
+                                                        Icons.delete,
+                                                        size: 20,
+                                                      ),
+                                                      onPressed: () {
+                                                        _openPopupDeleteTask(
+                                                          context,
+                                                          listAllTasks[index]
+                                                              .studyGroupId,
+                                                          listAllTasks[index]
+                                                              .type,
+                                                          listAllTasks[index]
+                                                              .id,
+                                                        );
+                                                      }),
                                                 )
                                               ],
                                             ),
