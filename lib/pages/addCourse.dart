@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:speedplanner/utils/AppBar.dart';
 //!import 'package:speedplanner/utils/AppBar.dart';
 import 'package:speedplanner/utils/colors.dart';
+import 'package:speedplanner/utils/dayInput.dart';
 import 'package:speedplanner/utils/normalInput.dart';
 import 'package:speedplanner/utils/desInput.dart';
 import 'package:speedplanner/utils/miniInput.dart';
@@ -120,7 +121,10 @@ class _AddCourseState extends State<AddCourse> {
       id, token, name, description, email, color) async {
     print(id);
     print(token);
-    if (dayArr.length != 0) {
+    if (dayArr.length != 0 ||
+        nameText.text == '' ||
+        descText.text == '' ||
+        emailText.text == '') {
       var urlCourses = Uri.parse(
           'https://speedplanner-mobile.herokuapp.com/api/users/$id/courses');
 
@@ -205,7 +209,7 @@ class _AddCourseState extends State<AddCourse> {
                           children: <Widget>[
                             Wrap(
                               direction: Axis.horizontal,
-                              spacing: 30.0,
+                              spacing: 75.0,
                               children: [
                                 Text(
                                   'Crear Curso',
@@ -340,7 +344,7 @@ class _AddCourseState extends State<AddCourse> {
                               direction: Axis.horizontal,
                               spacing: 5.0,
                               children: [
-                                miniInput(controller: dayText, hint: "Día"),
+                                dayInput(controller: dayText, hint: "Día"),
                                 miniInput(
                                     controller: startText, hint: "Hora ini."),
                                 miniInput(
@@ -431,7 +435,7 @@ class _AddCourseState extends State<AddCourse> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(top: 85),
+              padding: EdgeInsets.only(top: 125),
               child: Container(
                   color: dateBG,
                   width: double.infinity,
