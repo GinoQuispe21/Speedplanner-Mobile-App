@@ -27,6 +27,7 @@ class GroupsService {
                   'https://speedplanner-mobile.herokuapp.com/api/studyGroups/$groupId/simpleTasks'),
               headers: {HttpHeaders.authorizationHeader: token});
           if (responseSimpleTask.statusCode == 200) {
+            print('ESTE ES EL ID DE MIERDA DEL GRUPO QUE QUIERO VER $groupId');
             Map dataSimpleTask =
                 jsonDecode(utf8.decode(responseSimpleTask.bodyBytes));
             for (int j = 0; j < dataSimpleTask['content'].length; j++) {
@@ -38,11 +39,11 @@ class GroupsService {
                 dataSimpleTask['content'][j]['description'],
               ));
               listAllTasks.add(new ListTask(
-                dataSimpleTask['content'][j]['id'],
-                '(TS)',
-                dataSimpleTask['content'][j]['title'],
-                dataSimpleTask['content'][j]['finished'],
-              ));
+                  dataSimpleTask['content'][j]['id'],
+                  '(TS)',
+                  dataSimpleTask['content'][j]['title'],
+                  dataSimpleTask['content'][j]['finished'],
+                  groupId));
             }
           }
 
@@ -64,11 +65,11 @@ class GroupsService {
                 dataTimedTask['content'][k]['description'],
               ));
               listAllTasks.add(new ListTask(
-                dataTimedTask['content'][k]['id'],
-                '(TC)',
-                dataTimedTask['content'][k]['title'],
-                dataTimedTask['content'][k]['finished'],
-              ));
+                  dataTimedTask['content'][k]['id'],
+                  '(TC)',
+                  dataTimedTask['content'][k]['title'],
+                  dataTimedTask['content'][k]['finished'],
+                  groupId));
             }
           }
 
@@ -92,7 +93,7 @@ class GroupsService {
         print('Tamaño del arreglo: $sizeListTasks');
         for (int i = 0; i < sizeListTasks; i++) {
           print(
-              ' - ${listAllTasks[i].type} - ${listAllTasks[i].id} - ${listAllTasks[i].title}');
+              ' - ${listAllTasks[i].type} - ${listAllTasks[i].id} - ${listAllTasks[i].title} - ${listAllTasks[i].studyGroupId}');
         }
       }
     } catch (e) {
